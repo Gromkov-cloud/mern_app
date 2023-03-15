@@ -1,0 +1,29 @@
+{
+    "name": "mern_app",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "start": "node app.js",
+        "server": "nodemon app.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Gromkov-cloud/mern_app.git"
+    },
+    "author": "Vasiliy Gromkov",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Gromkov-cloud/mern_app/issues"
+    },
+    "homepage": "https://github.com/Gromkov-cloud/mern_app#readme",
+    "dependencies": {
+        "config": "^3.3.9",
+        "express": "^4.18.2",
+        "mongoose": "^7.0.2"
+    },
+    "devDependencies": {
+        "concurrently": "^7.6.0",
+        "nodemon": "^2.0.21"
+    }
+}
