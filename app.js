@@ -6,6 +6,20 @@ require('dotenv').config();
 
 const app = express()
 
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
+const list = ["vasiliy", "anton", "salavat"]
+
+app.post("/post", (req, res) => {
+    list.push(req.body.name)
+    res.status(200).json("ok")
+})
+
+app.get("/list", (req, res) => {
+    res.json(list)
+})
+
 async function start() {
     try {
         await mongoose.connect(process.env.MONGO_URI, {
