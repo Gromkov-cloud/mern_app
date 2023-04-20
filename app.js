@@ -27,9 +27,18 @@ async function start() {
             useUnifiedTopology: true,
         })
         app.listen(process.env.PORT, () => { console.log(`App has been started PORT=${process.env.PORT}`) })
+        const kittySchema = new mongoose.Schema({
+            name: String
+        });
+        const Kitten = mongoose.model('Kitten', kittySchema);
+        const fluffy = new Kitten({ name: 'fluffy' });
+        const puppy = new Kitten({ name: "Puppy" })
+        await fluffy.save();
+        await puppy.save()
     } catch (error) {
         console.log(error)
         process.exit(1)
     }
 }
 start()
+
