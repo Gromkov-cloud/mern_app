@@ -51,6 +51,7 @@ function App() {
         <div>
             <input type="text" onChange={onInputChange} />
             <button onClick={submitForm}>SUBMIT</button>
+            <img src="http://localhost:5000/model/a1312312sda" alt="" />
             <div>
                 <div>
                     <h1>Names list</h1>
