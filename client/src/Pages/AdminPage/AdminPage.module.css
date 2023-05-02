@@ -1,0 +1,15 @@
+.models_list {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+
+    max-width: 1000px;
+
+    padding-top: 50px;
+}
+
+.model_link {
+    display: block;
+    height: inherit;
+}

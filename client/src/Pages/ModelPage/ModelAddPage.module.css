@@ -1,0 +1,14 @@
+.model_add_form {
+    display: flex;
+    gap: 60px;
+}
+
+.model_add_form__content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.model_add_form__content input {
+    margin-left: 20px;
+}

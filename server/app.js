@@ -47,19 +47,6 @@ const modelRoute = require("./routes/model-router")
 
 const AWS = require('aws-sdk');
 
-const s3 = new AWS.S3({
-    accessKeyId: 'YCAJEXjNkzVVIB7iIYOzcAHjE',
-    secretAccessKey: 'YCMM8EYNfs3SpcEqg_JLLW51fEL3Qd1tZ1Oaqmk1',
-    endpoint: 'storage.yandexcloud.net',
-    sslEnabled: false
-});
-const params = {
-    Bucket: 'ar-app-bucket-v.gromkov',
-    Key: "mern.png"
-};
-
-const stream = s3.getObject(params).createReadStream();
-
 app.get("/model/:id", (req, res) => {
     const s3 = new AWS.S3({
         accessKeyId: 'YCAJEXjNkzVVIB7iIYOzcAHjE',
@@ -67,23 +54,19 @@ app.get("/model/:id", (req, res) => {
         endpoint: 'storage.yandexcloud.net',
         sslEnabled: false
     });
+    console.log(req.params)
     const params = {
         Bucket: 'ar-app-bucket-v.gromkov',
-        Key: "mern.png"
+        Key: req.params.id
     };
 
     const readStream = s3.getObject(params).createReadStream();
 
     readStream.on('data', (data) => {
-        res.write(data); // отправить данные на клиент
+        res.write(data);
     });
 
     readStream.on('end', () => {
-        res.end(); // закончить отправку данных на клиент
+        res.end();
     });
-
-    // res.setHeader('Content-disposition', 'attachment; filename=file.txt');
-    // res.setHeader('Content-type', 'text/plain');
-
-    // readStream.pipe(res);
 })  
