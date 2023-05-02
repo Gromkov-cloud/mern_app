@@ -1,17 +1,35 @@
 const S3Service = require("../services/s3-service")
-const fs = require('fs');
+const Model = require("../models/model-model")
 
 class ModelController {
     async getModel(req, res) {
-        const modelId = req.params.id
-        const readStream = S3Service.fetchModel(modelId, req, res)
-        console.log(readStream)
-        res.set({
-            'Content-Type': 'application/octet-stream',
-            'Content-Disposition': 'attachment; filename="file.txt"'
+        const params = {
+            Bucket: 'ar-app-bucket-v.gromkov',
+            Key: req.params.id
+        };
+
+        const readStream = S3Service.s3.getObject(params).createReadStream();
+
+        readStream.on('data', (data) => {
+            res.write(data);
         });
 
-        readStream.pipe(res);
+        readStream.on('end', () => {
+            res.end();
+        });
+    }
+
+    async postModel(req, res) {
+        const modelDto = {
+            name: req.body.name,
+            s3: {
+                model: req.file.key
+            }
+        }
+        const model = new Model(modelDto)
+        await model.save()
+        console.log(`модель загружена ${req.file.key}`)
+        res.status(200).json(`модель загружена ${req.file}`)
     }
 }
 

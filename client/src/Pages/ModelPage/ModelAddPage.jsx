@@ -11,8 +11,17 @@ const ModelPage = () => {
     const [modelName, setModelName] = useState("")
     const [modelDesc, setModelDesc] = useState("")
 
-    const handleUploadClick = () => {
-        console.log(model, image, modelName, modelDesc)
+    const handleUploadClick = async () => {
+        const formData = new FormData()
+        formData.append("file", model)
+        formData.append("name", JSON.stringify(modelName))
+
+        const result = await fetch("/api/model", {
+            method: "POST",
+            body: formData,
+        })
+
+        console.log(result)
     }
 
     return (
