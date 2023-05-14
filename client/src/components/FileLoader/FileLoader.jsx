@@ -1,7 +1,8 @@
 import { useRef } from "react"
 import styles from "./FileLoader.module.css"
+import UploadFileSvg from "../svg/UploadFileSvg"
 
-const FileLoader = ({ setFile, fileName }) => {
+const FileLoader = ({ setFile, file }) => {
     const inputRef = useRef(null)
 
     const handleFileChange = (e) => {
@@ -16,15 +17,29 @@ const FileLoader = ({ setFile, fileName }) => {
 
     return (
         <>
-            <input
-                type="file"
-                ref={inputRef}
-                onChange={handleFileChange}
-                style={{ display: "none" }}
-            />
-            <button onClick={handleChooseClick}>
-                Выбрать {fileName ? fileName : "Файл"}
-            </button>
+            <div className={styles.file_loader}>
+                <input
+                    type="file"
+                    ref={inputRef}
+                    onChange={handleFileChange}
+                    style={{ display: "none" }}
+                />
+                <button
+                    type="button"
+                    onClick={handleChooseClick}
+                    className={styles.button}
+                >
+                    <UploadFileSvg width="24px" height="24px" />
+                    Выбрать
+                </button>
+                {file?.name ? (
+                    <span className={styles.file_name__active}>
+                        {file.name}
+                    </span>
+                ) : (
+                    <span className={styles.file_name}>Выберете файл...</span>
+                )}
+            </div>
         </>
     )
 }

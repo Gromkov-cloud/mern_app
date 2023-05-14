@@ -1,16 +1,9 @@
 .display_mode {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translate(-50%, 0);
-
     width: fit-content;
     height: fit-content;
     padding: 10px 10px 0;
 
     background-color: aliceblue;
-    border-radius: 5px 5px 0 0;
-    box-shadow: 0 0 50px rgb(105, 105, 105);
 
     z-index: 2;
 }

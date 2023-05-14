@@ -1,0 +1,6 @@
+.model_frame {
+    position: relative;
+    min-height: 500px;
+
+    height: calc(100vh - 68.5px);
+}

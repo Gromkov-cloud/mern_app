@@ -8,7 +8,8 @@ import styles from "./Model.module.css"
 
 const Model = () => {
     const { id } = useParams()
-    let gltf = useLoader(GLTFLoader, `/api/model/${id}.glb`)
+    console.log(id)
+    let gltf = useLoader(GLTFLoader, `/api/model/${id}`)
 
     return (
         <div className={styles.model_container}>
