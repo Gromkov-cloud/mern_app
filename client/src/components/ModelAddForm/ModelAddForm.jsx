@@ -1,5 +1,6 @@
 import { useForm, Controller } from "react-hook-form"
-import { Button, TextField } from "@mui/material"
+import TextField from "@mui/material/TextField"
+import Button from "@mui/material/Button"
 import FileLoader from "../FileLoader/FileLoader"
 import { useState } from "react"
 
@@ -40,9 +41,10 @@ const ModelAddForm = () => {
                             onChange={onChange}
                             value={value}
                             id="standard-basic"
-                            label="Название модели*"
+                            label="Название модели"
                             variant="filled"
                             sx={{ color: "#000" }}
+                            required
                         />
                     )}
                 />
@@ -67,7 +69,11 @@ const ModelAddForm = () => {
                     name="modelFile"
                     control={control}
                     render={({ field: { onChange, value = "" } }) => (
-                        <FileLoader setFile={onChange} file={value} />
+                        <FileLoader
+                            setFile={onChange}
+                            file={value}
+                            title={"Файл модели *"}
+                        />
                     )}
                 />
 
@@ -75,7 +81,11 @@ const ModelAddForm = () => {
                     name="modelThumbnail"
                     control={control}
                     render={({ field: { onChange, value = "" } }) => (
-                        <FileLoader setFile={onChange} file={value} />
+                        <FileLoader
+                            setFile={onChange}
+                            file={value}
+                            title={"Изображение миниатюры"}
+                        />
                     )}
                 />
                 <Button size="medium" variant="outlined" type="submit">

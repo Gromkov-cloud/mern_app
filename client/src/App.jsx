@@ -12,7 +12,7 @@ function App() {
     return (
         <>
             <Routes>
-                <Route path="/admin" element={<AdminPage />} />
+                <Route path="/admin/*" element={<AdminPage />} />
                 <Route path="/model/:id" element={<ModelPage />} />
                 <Route
                     path="/model-settings/:id"
