@@ -1,6 +1,8 @@
 import { useRef } from "react"
-import styles from "./FileLoader.module.css"
+
 import UploadFileSvg from "../svg/UploadFileSvg"
+
+import styles from "./FileLoader.module.css"
 
 const FileLoader = ({ setFile, file, title }) => {
     const inputRef = useRef(null)
@@ -16,7 +18,7 @@ const FileLoader = ({ setFile, file, title }) => {
     }
 
     return (
-        <div>
+        <>
             <span className={styles.input_title}>{title}</span>
             <div className={styles.file_loader}>
                 <input
@@ -41,7 +43,7 @@ const FileLoader = ({ setFile, file, title }) => {
                     <span className={styles.file_name}>Выберете файл...</span>
                 )}
             </div>
-        </div>
+        </>
     )
 }
 

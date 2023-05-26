@@ -1,206 +1,156 @@
-import {
-    Box,
-    Button,
-    Divider,
-    Switch,
-    TextField,
-    Typography,
-} from "@mui/material"
 import { Controller, useForm } from "react-hook-form"
+
+import Box from "@mui/material/Box"
+import Button from "@mui/material/Button"
+import Grid from "@mui/material/Grid"
+import Switch from "@mui/material/Switch"
+import TextField from "@mui/material/TextField"
+import Typography from "@mui/material/Typography"
+
 import FileLoader from "../FileLoader/FileLoader"
+import ModelAccordionThumb from "./ModelAccordionThumb"
+
+const lorem100 =
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc eu iaculis dui, a pretium enim. Fusce non tellus tempor, vehicula mauris in, bibendum lorem. Etiam mollis lorem ac justo eleifend ornare. Etiam sollicitudin ultrices maximus. Quisque augue nisi, porttitor non dignissim sed, imperdiet et orci. Ut nibh libero, dictum ut urna sit amet, convallis ultricies massa. Sed auctor ex et risus vestibulum tincidunt. Pellentesque maximus nisi ac metus scelerisque, sed semper metus gravida. "
 
 const ModelAccordionForm = ({ model }) => {
     const {
-        register,
         handleSubmit,
         control,
-        watch,
         formState: { errors },
     } = useForm()
 
     const onFormSubmit = async (data) => {
-        const formData = new FormData()
-        formData.append("file", data.modelFile)
-        formData.append("name", JSON.stringify(data.modelName))
-
-        // const result = await fetch("/api/model", {
-        //     method: "POST",
-        //     body: formData,
-        // })
-
-        // console.log(result)
-        // console.log(JSON.stringify(formData))
         console.log(data)
     }
+
     return (
         <>
             <form onSubmit={handleSubmit(onFormSubmit)}>
-                <Box
-                    sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "20px",
-                    }}
-                >
-                    <Box>
+                <Grid container spacing={2}>
+                    {/* MODEL NAME AND MODEL THUMB CONTAINER ---> */}
+                    <Grid item xs={4}>
+                        <Box>
+                            {/* MODEL NAME INPUT ---> */}
+                            <Controller
+                                name="modelName"
+                                control={control}
+                                render={({
+                                    field: { onChange, value = model.name },
+                                }) => (
+                                    <TextField
+                                        onChange={onChange}
+                                        value={value}
+                                        id="standard-basic"
+                                        label="Название модели"
+                                        variant="outlined"
+                                        sx={{
+                                            color: "#000",
+                                            width: "100%",
+                                        }}
+                                    />
+                                )}
+                            />
+                            {/* <---  MODEL NAME INPUT */}
+
+                            {/* MODEL THUMB INPUT---> */}
+                            <Typography
+                                sx={(theme) => ({
+                                    fontSize: "16px",
+                                    color: theme.palette.text.secondary,
+                                    marginTop: "10px",
+                                })}
+                            >
+                                Миниатюра
+                            </Typography>
+                            <ModelAccordionThumb imgSrc={model.img} />
+                            {/* <---  MODEL THUMB INPUT*/}
+                        </Box>
+                    </Grid>
+                    {/* <---  MODEL NAME AND MODEL THUMB CONTAINER */}
+
+                    {/* MODEL DESCRIPTION INPUT CONTAINER ---> */}
+                    <Grid item xs={8}>
                         <Controller
-                            name="modelName"
+                            name="modelDescription"
                             control={control}
                             render={({
-                                field: { onChange, value = model.name },
+                                field: { onChange, value = lorem100 },
                             }) => (
                                 <TextField
                                     onChange={onChange}
                                     value={value}
-                                    id="standard-basic"
-                                    label="Название модели"
+                                    id="standard-textarea"
+                                    label="Описание модели"
+                                    multiline
+                                    rows={9}
                                     variant="outlined"
-                                    sx={{
-                                        color: "#000",
-                                        width: "fit-content",
-                                    }}
+                                    sx={{ color: "#000", width: "100%" }}
+                                />
+                            )}
+                        />
+                    </Grid>
+                    {/* <---  MODEL DESCRIPTION INPUT CONTAINER */}
+                </Grid>
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        gap: "20px",
+                    }}
+                >
+                    {/* MODEL FILE INPUT ---> */}
+                    <Box
+                        sx={{
+                            flexGrow: 2,
+                            width: "max-content",
+                            marginTop: "15px",
+                        }}
+                    >
+                        <Controller
+                            name="modelFile"
+                            control={control}
+                            render={({ field: { onChange, value = "" } }) => (
+                                <FileLoader
+                                    setFile={onChange}
+                                    file={value}
+                                    title={"Изменить файл модели"}
                                 />
                             )}
                         />
                     </Box>
+                    {/* <---  MODEL FILE INPUT */}
 
-                    <Controller
-                        name="modelFile"
-                        control={control}
-                        render={({ field: { onChange, value = "" } }) => (
-                            <FileLoader
-                                setFile={onChange}
-                                file={value}
-                                title={"Файл модели *"}
-                            />
-                        )}
-                    />
+                    {/* SWITCHER ---> */}
+                    <Box
+                        sx={{
+                            maxWidth: "max-content",
+                            width: "100%",
+                        }}
+                    >
+                        <Typography
+                            sx={(theme) => ({
+                                fontSize: "16px",
+                                color: theme.palette.text.secondary,
+                            })}
+                        >
+                            <Switch />
+                            Активировать модель
+                        </Typography>
+                    </Box>
+                    {/* <---  SWITCHER */}
 
-                    <Button size="medium" variant="outlined" type="submit">
+                    {/* FORM SUBMIT BTN ---> */}
+                    <Button
+                        variant="contained"
+                        type="submit"
+                        sx={{ width: "100%" }}
+                    >
                         Сохранить изменения
                     </Button>
+                    {/* <---  FORM SUBMIT BTN */}
                 </Box>
             </form>
-            <Typography
-                sx={(theme) => ({
-                    fontSize: "16px",
-                    color: theme.palette.text.secondary,
-                })}
-            >
-                Название
-            </Typography>
-            <Typography
-                sx={(theme) => ({
-                    fontSize: "18px",
-                })}
-            >
-                {model.name}
-            </Typography>
-            <Typography
-                sx={(theme) => ({
-                    fontSize: "16px",
-                    color: theme.palette.text.secondary,
-                })}
-            >
-                Название в хранилище
-            </Typography>
-            <Typography
-                sx={(theme) => ({
-                    fontSize: "18px",
-                })}
-            >
-                {model.s3.model}
-            </Typography>
-            <Typography
-                sx={(theme) => ({
-                    fontSize: "16px",
-                    color: theme.palette.text.secondary,
-                })}
-            >
-                Размер
-            </Typography>
-            <Typography
-                sx={(theme) => ({
-                    fontSize: "18px",
-                })}
-            >
-                1.4 мб
-            </Typography>
-            <Typography
-                sx={(theme) => ({
-                    fontSize: "16px",
-                    color: theme.palette.text.secondary,
-                })}
-            >
-                Описание
-            </Typography>
-            <Typography
-                sx={(theme) => ({
-                    fontSize: "18px",
-                })}
-            >
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                Dolorem facilis omnis dignissimos eius amet numquam labore ipsum
-                et. Ea voluptatem unde numquam id autem alias, consectetur,
-                totam vel deleniti est hic earum obcaecati rerum maxime
-                quisquam, quasi cum quidem? Quae animi et perspiciatis dolorem
-                quasi quas, aliquam consequuntur ab nam odit adipisci aliquid,
-                rerum hic, magni ducimus molestiae ipsum delectus! Asperiores
-                assumenda neque reiciendis. Quam, totam explicabo. Saepe
-                dolores, porro eum commodi odio harum veniam quaerat esse magnam
-                minima nemo iste consectetur fugiat dicta incidunt quasi dolorum
-                tempora! Perferendis consectetur iure, dignissimos magni nostrum
-                ullam ipsam architecto neque earum id!
-            </Typography>
-            <Typography
-                sx={(theme) => ({
-                    fontSize: "16px",
-                    color: theme.palette.text.secondary,
-                })}
-            >
-                Миниатюра
-            </Typography>
-            <Typography
-                sx={(theme) => ({
-                    fontSize: "18px",
-                })}
-            >
-                картинка
-            </Typography>
-
-            <Typography
-                sx={(theme) => ({
-                    fontSize: "16px",
-                    color: theme.palette.text.secondary,
-                })}
-            >
-                Дата добавления
-            </Typography>
-            <Typography
-                sx={(theme) => ({
-                    fontSize: "18px",
-                })}
-            >
-                21.07.22
-            </Typography>
-            <Typography
-                sx={(theme) => ({
-                    fontSize: "16px",
-                    color: theme.palette.text.secondary,
-                })}
-            >
-                <Switch />
-                Активировать модель
-            </Typography>
-
-            <Divider
-                sx={{
-                    margin: "15px 0",
-                }}
-            />
-            <Typography variant="h6" sx={{ margin: "0 0 15px" }}>
-                Редактирование
-            </Typography>
         </>
     )
 }
