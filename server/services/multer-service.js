@@ -8,7 +8,7 @@ class Multer {
     upload = multer({
         storage: multerS3({
             s3: S3Service.s3,
-            bucket: process.env.BUCKET_NAME,
+            bucket: process.env.S3_BUCKET_NAME,
             key: function (req, file, cb) {
                 cb(null, Date.now() + "-" + file.originalname);
             },
@@ -22,6 +22,7 @@ class Multer {
         })
     });
 }
+
 
 module.exports = new Multer
 

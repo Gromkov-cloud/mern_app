@@ -20,7 +20,7 @@ class ModelController {
         const model = await Model.findById(req.params.id)
 
         const params = {
-            Bucket: 'ar-app-bucket-v.gromkov',
+            Bucket: process.env.S3_BUCKET_NAME,
             Key: model.s3.model
         };
 
@@ -38,13 +38,18 @@ class ModelController {
     async postModel(req, res) {
         const modelDto = {
             name: req.body.name.replace(/"/g, ""),
+            fileName: req.files[0].originalname,
+            date: new Date(),
+            description: req.body.description,
+            size: req.files[0].size,
+            isActive: true,
             s3: {
-                model: req.file.key
+                model: req.files[0].key,
+                image: req.files[1].key
             }
         }
         const model = new Model(modelDto)
-        await model.save()
-        console.log(`модель загружена ${req.file.key}`)
+        const result = await model.save()
         res.status(200).json(`модель загружена ${req.file}`)
     }
 
@@ -56,7 +61,7 @@ class ModelController {
         const key = model.s3.model
 
         const params = {
-            Bucket: process.env.BUCKET_NAME,
+            Bucket: process.env.S3_BUCKET_NAME,
             Key: key,
         };
         S3Service.s3.deleteObject(params, (err, data) => {

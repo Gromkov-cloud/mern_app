@@ -3,10 +3,15 @@ const Schema = mongoose.Schema
 
 const models = new Schema({
     name: String,
+    fileName: String,
+    date: Date,
+    description: String,
+    size: Number,
+    isActive: Boolean,
     s3: {
-        model: String
+        model: String,
+        image: String
     },
-    description: String
 })
 
 const model = mongoose.model("model", models)
