@@ -2,15 +2,13 @@ import { useForm, Controller } from "react-hook-form"
 import TextField from "@mui/material/TextField"
 import Button from "@mui/material/Button"
 import FileLoader from "../FileLoader/FileLoader"
-
-import styles from "./ModelAddForm.module.css"
+import { Box, Divider, Typography } from "@mui/material"
 
 const ModelAddForm = () => {
     const {
-        register,
         handleSubmit,
         control,
-        watch,
+
         formState: { errors },
     } = useForm()
 
@@ -31,63 +29,92 @@ const ModelAddForm = () => {
 
     return (
         <>
-            <form onSubmit={handleSubmit(onFormSubmit)} className={styles.form}>
-                <Controller
-                    name="modelName"
-                    control={control}
-                    render={({ field: { onChange, value = "" } }) => (
-                        <TextField
-                            onChange={onChange}
-                            value={value}
-                            id="standard-basic"
-                            label="Название модели"
-                            variant="filled"
-                            sx={{ color: "#000" }}
-                            required
-                        />
-                    )}
-                />
-                <Controller
-                    name="modelDescription"
-                    control={control}
-                    render={({ field: { onChange, value = "" } }) => (
-                        <TextField
-                            onChange={onChange}
-                            value={value}
-                            id="standard-textarea"
-                            label="Описание модели"
-                            multiline
-                            rows={2}
-                            variant="filled"
-                            sx={{ color: "#000" }}
-                        />
-                    )}
-                />
+            <Typography variant="h5" textAlign={"center"}>
+                Добавьте новую модель
+            </Typography>
+            <Divider
+                sx={{
+                    margin: "15px 0",
+                }}
+            />
+            <form onSubmit={handleSubmit(onFormSubmit)}>
+                <Box
+                    sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "20px",
+                    }}
+                >
+                    <Controller
+                        name="modelName"
+                        control={control}
+                        render={({ field: { onChange, value = "" } }) => (
+                            <TextField
+                                onChange={onChange}
+                                value={value}
+                                id="standard-basic"
+                                label="Название модели"
+                                variant="filled"
+                                sx={{ color: "#000" }}
+                                required
+                            />
+                        )}
+                    />
+                    <Controller
+                        name="modelDescription"
+                        control={control}
+                        render={({ field: { onChange, value = "" } }) => (
+                            <TextField
+                                onChange={onChange}
+                                value={value}
+                                id="standard-textarea"
+                                label="Описание модели"
+                                multiline
+                                rows={2}
+                                variant="filled"
+                                sx={{ color: "#000" }}
+                            />
+                        )}
+                    />
+                </Box>
 
-                <Controller
-                    name="modelFile"
-                    control={control}
-                    render={({ field: { onChange, value = "" } }) => (
-                        <FileLoader
-                            setFile={onChange}
-                            file={value}
-                            title={"Файл модели *"}
-                        />
-                    )}
-                />
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
 
-                <Controller
-                    name="modelThumbnail"
-                    control={control}
-                    render={({ field: { onChange, value = "" } }) => (
-                        <FileLoader
-                            setFile={onChange}
-                            file={value}
-                            title={"Изображение миниатюры"}
+                        gap: "20px",
+                        m: "20px 0",
+                    }}
+                >
+                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                        <Controller
+                            name="modelFile"
+                            control={control}
+                            render={({ field: { onChange, value = "" } }) => (
+                                <FileLoader
+                                    setFile={onChange}
+                                    file={value}
+                                    title={"Файл модели *"}
+                                />
+                            )}
                         />
-                    )}
-                />
-                <Button size="medium" variant="outlined" type="submit">
+                    </Box>
+                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                        <Controller
+                            name="modelThumbnail"
+                            control={control}
+                            render={({ field: { onChange, value = "" } }) => (
+                                <FileLoader
+                                    setFile={onChange}
+                                    file={value}
+                                    title={"Изображение миниатюры"}
+                                />
+                            )}
+                        />
+                    </Box>
+                </Box>
+                <Button fullWidth variant="contained" type="submit">
                     Добавить модель
                 </Button>
             </form>
