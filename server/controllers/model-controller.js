@@ -36,6 +36,7 @@ class ModelController {
     }
 
     async postModel(req, res) {
+        console.log(req.files)
         const modelDto = {
             name: req.body.name.replace(/"/g, ""),
             fileName: req.files[0].originalname,
@@ -51,26 +52,32 @@ class ModelController {
         }
         const model = new Model(modelDto)
         const result = await model.save()
-        res.status(200).json(`модель загружена ${req.file}`)
+        res.status(200).json({ "result": result })
     }
 
     async deleteModel(req, res) {
         const id = req.params.id
 
-        const model = await Model.findOne({ _id: id })
+        const model = await Model.findById(id)
+        if (!model) {
+            res.json("такой модели не найдено")
+        }
+
         const deletedModel = await Model.deleteOne({ _id: id })
-        const key = model.s3.model
+        const deleteImage = await Model.deleteOne({ s3Name: model.s3.image })
 
         const params = {
             Bucket: process.env.S3_BUCKET_NAME,
-            Key: key,
+            Delete: {
+                Objects: [{ Key: model.s3.model }, { Key: model.s3.image }]
+            }
         };
-        S3Service.s3.deleteObject(params, (err, data) => {
+        S3Service.s3.deleteObjects(params, (err, data) => {
             if (err) {
                 console.log(err, err.stack);
-                res.status(500).json('Произошла ошибка при удалении файла');
+                res.status(500).json('Произошла ошибка при удалении файлов');
             } else {
-                res.json('Файл успешно удален!');
+                res.json('Файлы успешно удалены!');
             }
         });
     }

@@ -17,10 +17,14 @@ const ModelAccordionForm = ({ model }) => {
         formState: { errors },
     } = useForm()
 
-    const onFormSubmit = async (data) => {
-        console.log(data)
-    }
+    const onFormSubmit = async (data) => {}
 
+    const deleteBtnClickHandle = async (modelId) => {
+        const result = await fetch(`/api/model/${modelId}`, {
+            method: "DELETE",
+        })
+        console.log(await result.body.json)
+    }
     return (
         <>
             <form onSubmit={handleSubmit(onFormSubmit)}>
@@ -189,7 +193,14 @@ const ModelAccordionForm = ({ model }) => {
                 </Box>
 
                 {/* MODEL DELETE BTN ---> */}
-                <Button variant="outlined" fullWidth sx={{ m: "15px 0" }}>
+                <Button
+                    variant="outlined"
+                    fullWidth
+                    sx={{ m: "15px 0" }}
+                    onClick={() => {
+                        deleteBtnClickHandle(model._id)
+                    }}
+                >
                     Удалить модель
                 </Button>
                 {/* <---  MODEL DELETE BTN */}

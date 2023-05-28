@@ -14,17 +14,19 @@ const ModelAddForm = () => {
 
     const onFormSubmit = async (data) => {
         const formData = new FormData()
-        formData.append("file", data.modelFile)
+        formData.append("files", data.modelFile)
+        formData.append("files", data.modelThumbnail)
         formData.append("name", JSON.stringify(data.modelName))
+        formData.append("description", JSON.stringify(data.modelDescription))
 
-        // const result = await fetch("/api/model", {
-        //     method: "POST",
-        //     body: formData,
-        // })
+        console.log(formData)
 
-        // console.log(result)
-        // console.log(JSON.stringify(formData))
-        console.log(data)
+        const result = await fetch("/api/model", {
+            method: "POST",
+            body: formData,
+        })
+
+        console.log(await result.json())
     }
 
     return (
