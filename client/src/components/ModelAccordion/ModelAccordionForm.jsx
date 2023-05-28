@@ -10,9 +10,6 @@ import Typography from "@mui/material/Typography"
 import FileLoader from "../FileLoader/FileLoader"
 import ModelAccordionThumb from "./ModelAccordionThumb"
 
-const lorem100 =
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc eu iaculis dui, a pretium enim. Fusce non tellus tempor, vehicula mauris in, bibendum lorem. Etiam mollis lorem ac justo eleifend ornare. Etiam sollicitudin ultrices maximus. Quisque augue nisi, porttitor non dignissim sed, imperdiet et orci. Ut nibh libero, dictum ut urna sit amet, convallis ultricies massa. Sed auctor ex et risus vestibulum tincidunt. Pellentesque maximus nisi ac metus scelerisque, sed semper metus gravida. "
-
 const ModelAccordionForm = ({ model }) => {
     const {
         handleSubmit,
@@ -63,7 +60,7 @@ const ModelAccordionForm = ({ model }) => {
                             >
                                 Миниатюра
                             </Typography>
-                            <ModelAccordionThumb imgSrc={model.img} />
+                            <ModelAccordionThumb imgSrc={model.s3.image} />
                             {/* <---  MODEL THUMB INPUT*/}
                         </Box>
                     </Grid>
@@ -75,7 +72,10 @@ const ModelAccordionForm = ({ model }) => {
                             name="modelDescription"
                             control={control}
                             render={({
-                                field: { onChange, value = lorem100 },
+                                field: {
+                                    onChange,
+                                    value = model.description || "",
+                                },
                             }) => (
                                 <TextField
                                     onChange={onChange}
@@ -110,7 +110,12 @@ const ModelAccordionForm = ({ model }) => {
                         <Controller
                             name="modelFile"
                             control={control}
-                            render={({ field: { onChange, value = "" } }) => (
+                            render={({
+                                field: {
+                                    onChange,
+                                    value = { name: model.fileName },
+                                },
+                            }) => (
                                 <FileLoader
                                     setFile={onChange}
                                     file={value}
@@ -120,6 +125,32 @@ const ModelAccordionForm = ({ model }) => {
                         />
                     </Box>
                     {/* <---  MODEL FILE INPUT */}
+                    {/* MODEL THUMB INPUT ---> */}
+                    <Box
+                        sx={{
+                            flexGrow: 2,
+                            width: "max-content",
+                            marginTop: "15px",
+                        }}
+                    >
+                        <Controller
+                            name="modelImage"
+                            control={control}
+                            render={({
+                                field: {
+                                    onChange,
+                                    value = { name: model.imageName } || "",
+                                },
+                            }) => (
+                                <FileLoader
+                                    setFile={onChange}
+                                    file={value}
+                                    title={"Изменить миниатюру модели"}
+                                />
+                            )}
+                        />
+                    </Box>
+                    {/* <---  MODEL THUMB INPUT */}
 
                     {/* SWITCHER ---> */}
                     <Box
@@ -134,22 +165,44 @@ const ModelAccordionForm = ({ model }) => {
                                 color: theme.palette.text.secondary,
                             })}
                         >
-                            <Switch />
+                            <Controller
+                                name="isActive"
+                                control={control}
+                                render={({
+                                    field: {
+                                        onChange,
+                                        value = model.isActive || false,
+                                    },
+                                }) => (
+                                    <Switch
+                                        // value="isActive"
+                                        checked={value}
+                                        onChange={onChange}
+                                        name="isActive"
+                                    />
+                                )}
+                            />
                             Активировать модель
                         </Typography>
                     </Box>
                     {/* <---  SWITCHER */}
-
-                    {/* FORM SUBMIT BTN ---> */}
-                    <Button
-                        variant="contained"
-                        type="submit"
-                        sx={{ width: "100%" }}
-                    >
-                        Сохранить изменения
-                    </Button>
-                    {/* <---  FORM SUBMIT BTN */}
                 </Box>
+
+                {/* MODEL DELETE BTN ---> */}
+                <Button variant="outlined" fullWidth sx={{ m: "15px 0" }}>
+                    Удалить модель
+                </Button>
+                {/* <---  MODEL DELETE BTN */}
+
+                {/* FORM SUBMIT BTN ---> */}
+                <Button
+                    variant="contained"
+                    type="submit"
+                    sx={{ width: "100%" }}
+                >
+                    Сохранить изменения
+                </Button>
+                {/* <---  FORM SUBMIT BTN */}
             </form>
         </>
     )

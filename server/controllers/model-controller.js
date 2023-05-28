@@ -39,6 +39,7 @@ class ModelController {
         const modelDto = {
             name: req.body.name.replace(/"/g, ""),
             fileName: req.files[0].originalname,
+            imageName: req.files[1].originalname,
             date: new Date(),
             description: req.body.description,
             size: req.files[0].size,

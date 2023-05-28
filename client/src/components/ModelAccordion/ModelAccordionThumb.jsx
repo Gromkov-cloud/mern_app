@@ -4,7 +4,7 @@ import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 
 const ModelAccordionThumb = ({ imgSrc }) => {
     return imgSrc ? (
-        <img src={imgSrc} alt="" />
+        <img src={`/api/image/${imgSrc}`} alt="" />
     ) : (
         <Box
             width={"100%"}

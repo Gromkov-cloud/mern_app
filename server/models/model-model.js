@@ -4,6 +4,7 @@ const Schema = mongoose.Schema
 const models = new Schema({
     name: String,
     fileName: String,
+    imageName: String,
     date: Date,
     description: String,
     size: Number,
