@@ -10,6 +10,24 @@ import Typography from "@mui/material/Typography"
 import FileLoader from "../FileLoader/FileLoader"
 import ModelAccordionThumb from "./ModelAccordionThumb"
 
+const createValidFormData = (data) => {
+    // проверка на измененность/пустоту полей
+    if (!Object.values(data).filter((field) => field).length) {
+        return null
+    }
+
+    const formData = new FormData()
+    for (const key in data) {
+        if (typeof data[key] === "object") {
+            formData.append("files", data[key])
+        } else {
+            data[key] && formData.append([key], data[key])
+        }
+    }
+
+    return formData
+}
+
 const ModelAccordionForm = ({ model }) => {
     const {
         handleSubmit,
@@ -17,7 +35,9 @@ const ModelAccordionForm = ({ model }) => {
         formState: { errors },
     } = useForm()
 
-    const onFormSubmit = async (data) => {}
+    const onFormSubmit = async (data) => {
+        const formData = createValidFormData(data)
+    }
 
     const deleteBtnClickHandle = async (modelId) => {
         const result = await fetch(`/api/model/${modelId}`, {
@@ -34,7 +54,7 @@ const ModelAccordionForm = ({ model }) => {
                         <Box>
                             {/* MODEL NAME INPUT ---> */}
                             <Controller
-                                name="modelName"
+                                name="name"
                                 control={control}
                                 render={({
                                     field: { onChange, value = model.name },
@@ -73,12 +93,12 @@ const ModelAccordionForm = ({ model }) => {
                     {/* MODEL DESCRIPTION INPUT CONTAINER ---> */}
                     <Grid item xs={8}>
                         <Controller
-                            name="modelDescription"
+                            name="description"
                             control={control}
                             render={({
                                 field: {
                                     onChange,
-                                    value = model.description || "",
+                                    value = model.description || null,
                                 },
                             }) => (
                                 <TextField
@@ -138,7 +158,7 @@ const ModelAccordionForm = ({ model }) => {
                         }}
                     >
                         <Controller
-                            name="modelImage"
+                            name="thumbFile"
                             control={control}
                             render={({
                                 field: {

@@ -36,7 +36,6 @@ class ModelController {
     }
 
     async postModel(req, res) {
-        console.log(req.files)
         const modelDto = {
             name: req.body.name.replace(/"/g, ""),
             fileName: req.files[0].originalname,

@@ -21,12 +21,12 @@ const ModelAddForm = () => {
 
         console.log(formData)
 
-        const result = await fetch("/api/model", {
-            method: "POST",
-            body: formData,
-        })
+        // const result = await fetch("/api/model", {
+        //     method: "POST",
+        //     body: formData,
+        // })
 
-        console.log(await result.json())
+        // console.log(await result.json())
     }
 
     return (
