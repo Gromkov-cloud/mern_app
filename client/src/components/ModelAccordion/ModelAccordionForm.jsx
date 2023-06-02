@@ -10,18 +10,26 @@ import Typography from "@mui/material/Typography"
 import FileLoader from "../FileLoader/FileLoader"
 import ModelAccordionThumb from "./ModelAccordionThumb"
 
-const createValidFormData = (data) => {
-    // проверка на измененность/пустоту полей
-    if (!Object.values(data).filter((field) => field).length) {
+const createValidFormData = (data, id) => {
+    const isDataEmpty = Boolean(
+        Object.values(data).filter((field) => field !== undefined).length
+    )
+
+    if (!isDataEmpty) {
         return null
     }
 
     const formData = new FormData()
+
+    if (id) {
+        formData.append("id", id)
+    }
+
     for (const key in data) {
         if (typeof data[key] === "object") {
             formData.append("files", data[key])
         } else {
-            data[key] && formData.append([key], data[key])
+            data[key] !== undefined && formData.append([key], data[key])
         }
     }
 
@@ -36,7 +44,19 @@ const ModelAccordionForm = ({ model }) => {
     } = useForm()
 
     const onFormSubmit = async (data) => {
-        const formData = createValidFormData(data)
+        const formData = createValidFormData(data, model._id)
+
+        console.log(formData)
+        if (!formData) {
+            console.log("no data")
+        }
+
+        const response = await fetch(`/api/model/update/${model._id}`, {
+            method: "POST",
+            body: formData,
+        })
+
+        console.log(await response.json())
     }
 
     const deleteBtnClickHandle = async (modelId) => {

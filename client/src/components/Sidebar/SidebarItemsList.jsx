@@ -35,7 +35,7 @@ const SidebarItemsList = () => {
                 return (
                     <ListItemButton
                         key={index}
-                        selected={selectedIndex === { index }}
+                        selected={selectedIndex === index}
                         onClick={(event) =>
                             handleListItemClick(event, { index })
                         }

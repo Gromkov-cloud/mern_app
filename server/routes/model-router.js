@@ -9,5 +9,6 @@ router.delete("/model/:id", modelController.deleteModel)
 router.get("/models", modelController.getModels)
 router.get("/model-info/:id", modelController.getModelInfo)
 router.post("/model", multerService.upload.array("files", 2), modelController.postModel)
+router.post("/model/update/:id", multerService.upload.array("files", 2), modelController.updateModel)
 
 module.exports = router

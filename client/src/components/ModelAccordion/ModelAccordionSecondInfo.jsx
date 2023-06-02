@@ -48,6 +48,12 @@ const getParamsList = (model) => [
         name: "Дата добавления ММ-ДД-ГГ",
         value: model.date ? prettifyDate(model.date) : "Дата не указана",
     },
+    {
+        name: "Дата последнего обновления ММ-ДД-ГГ",
+        value: model.updateDate
+            ? prettifyDate(model.updateDate)
+            : "Модель не обновлялась",
+    },
 ]
 
 const ModelAccordionSecondInfo = ({ model }) => {

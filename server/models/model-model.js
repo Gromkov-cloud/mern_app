@@ -6,6 +6,7 @@ const models = new Schema({
     fileName: String,
     imageName: String,
     date: Date,
+    updateDate: Date,
     description: String,
     size: Number,
     isActive: Boolean,
