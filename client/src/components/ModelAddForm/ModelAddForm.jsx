@@ -1,30 +1,75 @@
 import { useForm, Controller } from "react-hook-form"
 import TextField from "@mui/material/TextField"
-import Button from "@mui/material/Button"
 import FileLoader from "../FileLoader/FileLoader"
-import { Box, Divider, Typography } from "@mui/material"
+import { Alert, Box, Divider, Snackbar, Typography } from "@mui/material"
+import LoadingButton from "@mui/lab/LoadingButton"
+import { useState } from "react"
+
+const createValidFormData = (data, id) => {
+    const isDataEmpty = Boolean(
+        Object.values(data).filter((field) => field !== undefined).length
+    )
+
+    if (!isDataEmpty) {
+        return null
+    }
+
+    const formData = new FormData()
+
+    if (id) {
+        formData.append("id", id)
+    }
+
+    for (const key in data) {
+        if (typeof data[key] === "object") {
+            formData.append("files", data[key])
+        } else {
+            data[key] !== undefined && formData.append([key], data[key])
+        }
+    }
+
+    return formData
+}
 
 const ModelAddForm = () => {
+    const [loading, setLoading] = useState(false)
+    const [isSuccess, setSuccess] = useState(true)
+    const [open, setOpen] = useState(false)
+
     const {
         handleSubmit,
         control,
-
         formState: { errors },
+        reset,
     } = useForm()
 
     const onFormSubmit = async (data) => {
-        const formData = new FormData()
-        formData.append("files", data.modelFile)
-        formData.append("files", data.modelThumbnail)
-        formData.append("name", JSON.stringify(data.modelName))
-        formData.append("description", JSON.stringify(data.modelDescription))
+        const formData = createValidFormData(data)
 
-        const result = await fetch("/api/model", {
+        console.log(formData)
+
+        setLoading(true)
+        const response = await fetch("/api/model", {
             method: "POST",
             body: formData,
         })
+        setLoading(false)
+        setSuccess(response.ok)
+        setOpen(true)
 
-        console.log(await result.json())
+        if (response.ok) {
+            reset()
+        }
+
+        console.log(response)
+    }
+
+    const handleClose = (event, reason) => {
+        if (reason === "clickaway") {
+            return
+        }
+
+        setOpen(false)
     }
 
     return (
@@ -48,15 +93,17 @@ const ModelAddForm = () => {
                     <Controller
                         name="modelName"
                         control={control}
+                        rules={{ required: "Введите название модели" }}
                         render={({ field: { onChange, value = "" } }) => (
                             <TextField
                                 onChange={onChange}
                                 value={value}
                                 id="standard-basic"
-                                label="Название модели"
+                                label="Название модели *"
                                 variant="filled"
                                 sx={{ color: "#000" }}
-                                required
+                                helperText={errors.modelName?.message}
+                                error={!!errors.modelName}
                             />
                         )}
                     />
@@ -81,7 +128,7 @@ const ModelAddForm = () => {
                 <Box
                     sx={{
                         display: "flex",
-                        alignItems: "center",
+                        alignItems: "flex-start",
 
                         gap: "20px",
                         m: "20px 0",
@@ -91,11 +138,13 @@ const ModelAddForm = () => {
                         <Controller
                             name="modelFile"
                             control={control}
+                            rules={{ required: "Выберете файл модели" }}
                             render={({ field: { onChange, value = "" } }) => (
                                 <FileLoader
                                     setFile={onChange}
                                     file={value}
                                     title={"Файл модели *"}
+                                    error={errors.modelFile}
                                 />
                             )}
                         />
@@ -114,10 +163,33 @@ const ModelAddForm = () => {
                         />
                     </Box>
                 </Box>
-                <Button fullWidth variant="contained" type="submit">
+                <LoadingButton
+                    loading={loading}
+                    fullWidth
+                    variant="contained"
+                    type="submit"
+                    startIcon={false}
+                    // disabled={!isValid}
+                >
                     Добавить модель
-                </Button>
+                </LoadingButton>
             </form>
+            <Snackbar
+                open={open}
+                autoHideDuration={6000}
+                onClose={handleClose}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            >
+                <Alert
+                    onClose={handleClose}
+                    severity={isSuccess ? "success" : "error"}
+                    sx={{ width: "100%" }}
+                >
+                    {isSuccess
+                        ? "Модель добавлена"
+                        : "Произошла ошибка, попробуйте еще раз"}
+                </Alert>
+            </Snackbar>
         </>
     )
 }

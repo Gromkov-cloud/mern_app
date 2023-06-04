@@ -7,3 +7,4 @@
         p: { xs: 1, }
 
 4.  [ ] https://www.sammeechward.com/storing-images-in-s3-from-node-server тут можно посмотреть как мигрировать на aws sdk v3
+5.  [ ] Вынести повторяющиеся инпуты в компоненту

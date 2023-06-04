@@ -9,13 +9,20 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 
 import ModelAccordionForm from "./ModelAccordionForm"
 import ModelAccordionSecondInfo from "./ModelAccordionSecondInfo"
+import { useState } from "react"
 
 const ModelAccordionList = ({ models }) => {
     return models.map((model) => {
+        const [isDeleted, setDeleted] = useState(false)
+
         return (
             <Accordion key={model._id}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="h6">{model.name}</Typography>
+                    <Typography variant="h6">
+                        {isDeleted
+                            ? `${model.name || "Без названия"} (Удалено)`
+                            : model.name || "Без названия"}
+                    </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                     <Box>
@@ -29,7 +36,11 @@ const ModelAccordionList = ({ models }) => {
                             Основная информация
                         </Typography>
 
-                        <ModelAccordionForm model={model} />
+                        <ModelAccordionForm
+                            model={model}
+                            setDeleted={setDeleted}
+                            isDeleted={isDeleted}
+                        />
                         {/* <---  MAIN INFO */}
 
                         {/* SECOND INFO ---> */}

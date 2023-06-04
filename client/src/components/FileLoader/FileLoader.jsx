@@ -4,7 +4,7 @@ import UploadFileSvg from "../svg/UploadFileSvg"
 
 import styles from "./FileLoader.module.css"
 
-const FileLoader = ({ setFile, file, title }) => {
+const FileLoader = ({ setFile, file, title, error }) => {
     const inputRef = useRef(null)
 
     const handleFileChange = (e) => {
@@ -43,6 +43,7 @@ const FileLoader = ({ setFile, file, title }) => {
                     <span className={styles.file_name}>Выберете файл...</span>
                 )}
             </div>
+            <span style={{ color: "#d32f2f" }}>{error?.message}</span>
         </>
     )
 }

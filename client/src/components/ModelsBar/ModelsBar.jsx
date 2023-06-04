@@ -20,7 +20,7 @@ const ModelsBar = () => {
 
     const [models, setModels] = useState([])
     const getModels = async () => {
-        const response = await fetch("/api/models")
+        const response = await fetch("/api/models?isActive=true")
         const data = await response.json()
         setModels(data)
     }

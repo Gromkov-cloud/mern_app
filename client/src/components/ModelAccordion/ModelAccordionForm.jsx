@@ -9,6 +9,9 @@ import Typography from "@mui/material/Typography"
 
 import FileLoader from "../FileLoader/FileLoader"
 import ModelAccordionThumb from "./ModelAccordionThumb"
+import { useState } from "react"
+import { Alert, Snackbar } from "@mui/material"
+import LoadingButton from "@mui/lab/LoadingButton/LoadingButton"
 
 const createValidFormData = (data, id) => {
     const isDataEmpty = Boolean(
@@ -36,7 +39,14 @@ const createValidFormData = (data, id) => {
     return formData
 }
 
-const ModelAccordionForm = ({ model }) => {
+const ModelAccordionForm = ({ model, setDeleted, isDeleted }) => {
+    const [saveSnackOpen, setSaveSnackOpen] = useState(false)
+    const [isSaveSuccess, setSaveSuccess] = useState(true)
+    const [deleteSnackOpen, setDeleteSnackOpen] = useState(false)
+    const [isDeleteSuccess, setDeleteSuccess] = useState(true)
+    const [isDeleteBtnLoading, setDeleteBtnLoading] = useState(false)
+    const [isSaveBtnLoading, setSaveBtnLoading] = useState(false)
+
     const {
         handleSubmit,
         control,
@@ -49,22 +59,49 @@ const ModelAccordionForm = ({ model }) => {
         console.log(formData)
         if (!formData) {
             console.log("no data")
+            return
         }
 
+        setSaveBtnLoading(true)
         const response = await fetch(`/api/model/update/${model._id}`, {
             method: "POST",
             body: formData,
         })
+        setSaveBtnLoading(false)
+        setSaveSuccess(response.ok)
+        setSaveSnackOpen(true)
 
         console.log(await response.json())
     }
 
     const deleteBtnClickHandle = async (modelId) => {
-        const result = await fetch(`/api/model/${modelId}`, {
+        setDeleteBtnLoading(true)
+        const response = await fetch(`/api/model/${modelId}`, {
             method: "DELETE",
         })
-        console.log(await result.body.json)
+        setDeleteBtnLoading(false)
+        setDeleteSuccess(response.ok)
+        setDeleteSnackOpen(true)
+        setDeleted(true)
+
+        console.log(await response.body.json)
     }
+
+    const handleSaveSnackClose = (event, reason) => {
+        if (reason === "clickaway") {
+            return
+        }
+
+        setSaveSnackOpen(false)
+    }
+    const handleDeleteSnackClose = (event, reason) => {
+        if (reason === "clickaway") {
+            return
+        }
+
+        setDeleteSnackOpen(false)
+    }
+
     return (
         <>
             <form onSubmit={handleSubmit(onFormSubmit)}>
@@ -74,10 +111,16 @@ const ModelAccordionForm = ({ model }) => {
                         <Box>
                             {/* MODEL NAME INPUT ---> */}
                             <Controller
-                                name="name"
+                                name="modelName"
                                 control={control}
+                                // rules={{
+                                //     required: "Введите название",
+                                // }}
                                 render={({
-                                    field: { onChange, value = model.name },
+                                    field: {
+                                        onChange,
+                                        value = model.name || "",
+                                    },
                                 }) => (
                                     <TextField
                                         onChange={onChange}
@@ -89,6 +132,8 @@ const ModelAccordionForm = ({ model }) => {
                                             color: "#000",
                                             width: "100%",
                                         }}
+                                        helperText={errors.modelName?.message}
+                                        error={!!errors.modelName}
                                     />
                                 )}
                             />
@@ -118,7 +163,7 @@ const ModelAccordionForm = ({ model }) => {
                             render={({
                                 field: {
                                     onChange,
-                                    value = model.description || null,
+                                    value = model.description || "",
                                 },
                             }) => (
                                 <TextField
@@ -233,28 +278,62 @@ const ModelAccordionForm = ({ model }) => {
                 </Box>
 
                 {/* MODEL DELETE BTN ---> */}
-                <Button
-                    variant="outlined"
+                <LoadingButton
+                    loading={isDeleteBtnLoading}
                     fullWidth
+                    variant="outlined"
                     sx={{ m: "15px 0" }}
-                    onClick={() => {
-                        deleteBtnClickHandle(model._id)
-                    }}
+                    onClick={() => deleteBtnClickHandle(model._id)}
+                    disabled={isSaveBtnLoading || isDeleted}
                 >
                     Удалить модель
-                </Button>
+                </LoadingButton>
                 {/* <---  MODEL DELETE BTN */}
 
                 {/* FORM SUBMIT BTN ---> */}
-                <Button
+                <LoadingButton
+                    loading={isSaveBtnLoading}
+                    fullWidth
                     variant="contained"
                     type="submit"
-                    sx={{ width: "100%" }}
+                    disabled={isDeleteBtnLoading || isDeleted}
                 >
                     Сохранить изменения
-                </Button>
+                </LoadingButton>
                 {/* <---  FORM SUBMIT BTN */}
             </form>
+            <Snackbar
+                open={saveSnackOpen}
+                autoHideDuration={6000}
+                onClose={handleSaveSnackClose}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            >
+                <Alert
+                    onClose={handleSaveSnackClose}
+                    severity={isSaveSuccess ? "success" : "error"}
+                    sx={{ width: "100%" }}
+                >
+                    {isSaveSuccess
+                        ? "Модель обновлена"
+                        : "Произошла ошибка, попробуйте еще раз"}
+                </Alert>
+            </Snackbar>
+            <Snackbar
+                open={deleteSnackOpen}
+                autoHideDuration={6000}
+                onClose={handleDeleteSnackClose}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            >
+                <Alert
+                    onClose={handleDeleteSnackClose}
+                    severity={isDeleteSuccess ? "success" : "error"}
+                    sx={{ width: "100%" }}
+                >
+                    {isDeleteSuccess
+                        ? "Модель успешно удалена"
+                        : "Произошла ошибка, попробуйте еще раз"}
+                </Alert>
+            </Snackbar>
         </>
     )
 }

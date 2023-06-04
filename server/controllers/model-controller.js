@@ -4,11 +4,13 @@ const s3Service = require("../services/s3-service");
 var ObjectId = require('mongodb').ObjectId;
 require('dotenv').config()
 
-// возвращает тело запроса с свойством s3 где записываются файлы, 
-// которые были изменены(которые пришли с клиента)
-// в случае если файлы не были изменены, то есть req.files пустой
-// то тело запроса не будет изменено
+
 const pickFiles = (files, reqBody) => {
+    // возвращает тело запроса с свойством s3 где записываются файлы,
+    // которые были изменены(которые пришли с клиента)
+    // в случае если файлы не были изменены, то есть req.files пустой
+    // то тело запроса не будет изменено
+
     if (files.length) {
         const s3Files = {}
 
@@ -35,11 +37,28 @@ const pickFiles = (files, reqBody) => {
     }
 
 }
+const getDeleteParams = (modelFileNames) => {
+    modelFileNames = { ...modelFileNames }
+    const params = {
+        Bucket: process.env.S3_BUCKET_NAME,
+        Delete: {
+            Objects: [],
+        },
+    }
+
+    for (const key in modelFileNames) {
+        if (modelFileNames[key]) {
+            params.Delete.Objects.push({ Key: modelFileNames[key] })
+        }
+    }
+
+    return params
+}
 
 const getModelDTO = (reqBody, oldData) => {
     const modelDTO = JSON.parse(JSON.stringify(oldData))
 
-    if (reqBody.name) { modelDTO.name = reqBody.name }
+    if (reqBody.modelName) { modelDTO.name = reqBody.modelName }
     if (reqBody.description) { modelDTO.description = reqBody.description }
     if (reqBody.isActive) { modelDTO.isActive = reqBody.isActive }
     if (reqBody.s3) {
@@ -73,17 +92,9 @@ const getDeleteOptions = (data, oldData) => {
     }
 }
 
+
 class ModelController {
-    async getModels(req, res) {
-        const models = await Model.find()
-        res.status(200).json(models)
-    }
-    async getModelInfo(req, res) {
-        const id = req.params.id
-        const info = await Model.findById(id)
-        console.log(info)
-        res.status(200).json(info)
-    }
+
     async getModel(req, res) {
 
         const model = await Model.findById(req.params.id)
@@ -103,49 +114,29 @@ class ModelController {
             res.end();
         });
     }
+    async getModels(req, res) {
+
+        const filters = req.query
+        const models = await Model.find(filters)
+        res.status(200).json(models)
+    }
     async postModel(req, res) {
         const modelDto = {
-            name: req.body.name.replace(/"/g, ""),
+            name: req.body.modelName,
             fileName: req.files[0].originalname,
-            imageName: req.files[1].originalname,
+            imageName: req.files[1]?.originalname || null,
             date: new Date(),
-            description: req.body.description.replace(/"/g, ""),
+            description: req.body.description || null,
             size: req.files[0].size,
             isActive: true,
             s3: {
                 model: req.files[0].key,
-                image: req.files[1].key
+                image: req.files[1]?.key || null
             }
         }
         const model = new Model(modelDto)
         const result = await model.save()
         res.status(200).json({ "result": result })
-    }
-    async deleteModel(req, res) {
-        const id = req.params.id
-
-        const model = await Model.findById(id)
-        if (!model) {
-            res.json("такой модели не найдено")
-        }
-
-        const deletedModel = await Model.deleteOne({ _id: id })
-        const deleteImage = await Model.deleteOne({ s3Name: model.s3.image })
-
-        const params = {
-            Bucket: process.env.S3_BUCKET_NAME,
-            Delete: {
-                Objects: [{ Key: model.s3.model }, { Key: model.s3.image }]
-            }
-        };
-        S3Service.s3.deleteObjects(params, (err, data) => {
-            if (err) {
-                console.log(err, err.stack);
-                res.status(500).json('Произошла ошибка при удалении файлов');
-            } else {
-                res.json('Файлы успешно удалены!');
-            }
-        });
     }
     async updateModel(req, res) {
 
@@ -168,6 +159,33 @@ class ModelController {
         }
 
         res.json(result)
+    }
+    async deleteModel(req, res) {
+        const id = req.params.id
+
+        const model = await Model.findById(id)
+        if (!model) {
+            res.json("такой модели не найдено")
+        }
+
+        const deletedModel = await Model.deleteOne({ _id: id })
+
+        S3Service.s3.deleteObjects(getDeleteParams(model.s3), (err, data) => {
+            if (err) {
+                console.log(err, err.stack);
+                res.status(500).json('Произошла ошибка при удалении файлов');
+            } else {
+                res.json('Файлы успешно удалены!');
+            }
+        });
+        res.status(200)
+    }
+
+    async getModelInfo(req, res) {
+        const id = req.params.id
+        const info = await Model.findById(id)
+        console.log(info)
+        res.status(200).json(info)
     }
 }
 
