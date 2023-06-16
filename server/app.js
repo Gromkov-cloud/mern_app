@@ -25,6 +25,9 @@ app.use(cookieParser())
 //ROUTES
 const modelRoute = require("./routes/model-router")
 const imageRoute = require("./routes/image-router")
+const authRoute = require("./routes/auth-router")
+
 
 app.use(modelRoute)
 app.use(imageRoute)
+app.use("/api", authRoute)
