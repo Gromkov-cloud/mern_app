@@ -6,12 +6,14 @@ const tokenService = require("./token-service")
 const UserService = class {
     async login(login, password) {
         const user = await User.findOne({ login })
+
         if (!user) {
-            throw ApiError.BadRequest("Некорректный логин")
+            throw ApiError.BadRequest("Некорректный логин", ["login"])
         }
+
         const isPasswordEquals = await bcrypt.compare(password, user.password)
         if (!isPasswordEquals) {
-            throw ApiError.BadRequest("Некорректный пароль")
+            throw ApiError.BadRequest("Некорректный пароль", ["password"])
         }
 
         const userDto = { login: user.login, roles: user.roles }

@@ -7,6 +7,7 @@ import ModelAddPage from "./Pages/ModelPage/ModelAddPage"
 import ModelSettingsPage from "./Pages/ModelSettingsPage/ModelSettingsPage"
 
 import "./App.css"
+import LoginPage from "./Pages/LoginPage/LoginPage"
 
 function App() {
     return (
@@ -20,6 +21,7 @@ function App() {
                 />
                 <Route path="/model-add" element={<ModelAddPage />} />
                 <Route path="/model" element={<ModelPage />} />
+                <Route path="/login" element={<LoginPage />} />
                 <Route path="/" element={<RootPage />} />
             </Routes>
         </>

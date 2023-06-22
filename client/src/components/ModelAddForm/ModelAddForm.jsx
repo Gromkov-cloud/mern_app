@@ -169,7 +169,6 @@ const ModelAddForm = () => {
                     variant="contained"
                     type="submit"
                     startIcon={false}
-                    // disabled={!isValid}
                 >
                     Добавить модель
                 </LoadingButton>

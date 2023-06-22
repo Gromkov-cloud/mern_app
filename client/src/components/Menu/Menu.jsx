@@ -112,6 +112,17 @@ function ResponsiveAppBar() {
                                     admin
                                 </NavLink>
                             </MenuItem>
+                            <MenuItem>
+                                <NavLink
+                                    to={"/login"}
+                                    style={{
+                                        color: "black",
+                                        textDecoration: "none",
+                                    }}
+                                >
+                                    login
+                                </NavLink>
+                            </MenuItem>
                         </Menu>
                     </Box>
                     <ViewInArRoundedIcon
