@@ -8,7 +8,7 @@ const app = express()
 
 const appStart = async () => {
     try {
-        await mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+        // await mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
         console.log(`Db is successful connected`)
         await app.listen(process.env.PORT)
         console.log(`App has been started on PORT=${process.env.PORT}`)
@@ -34,8 +34,9 @@ const authRoute = require("./routes/auth-router")
 const erroMiddleware = require("./middleware/erro-middleware")
 
 
-app.use(modelRoute)
-app.use(imageRoute)
-app.use("/api", authRoute)
+// app.use(modelRoute)
+// app.use(imageRoute)
+// app.use("/api", authRoute)
+app.use("/", (req, res) => { res.json("hello vercel, it is simple route, mongo db is turn off") })
 
 app.use(erroMiddleware)
