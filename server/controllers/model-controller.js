@@ -115,7 +115,7 @@ class ModelController {
         });
     }
     async getModels(req, res) {
-
+        console.log("tuc tuc")
         const filters = req.query
         const models = await Model.find(filters)
         res.status(200).json(models)
