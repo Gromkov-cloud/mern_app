@@ -3,6 +3,7 @@ const mongoose = require("mongoose")
 const cookieParser = require("cookie-parser")
 const cors = require("cors")
 require('dotenv').config()
+const path = require("path")
 
 const app = express()
 
@@ -34,9 +35,21 @@ const authRoute = require("./routes/auth-router")
 const erroMiddleware = require("./middleware/erro-middleware")
 
 
-app.use(modelRoute)
+app.use("/api", modelRoute)
 app.use(imageRoute)
 app.use("/api", authRoute)
-app.use("/", (req, res) => { res.json("hello vercel, it is simple route") })
+// app.use("/", (req, res) => { res.json("hello vercel, it is simple route") })
+
+app.use(express.static(path.join(__dirname, "../client/dist")))
+app.get("*", (req, res) => {
+    try {
+        res.sendFile(path.join(__dirname, "../client/dist/index.html"), (err) => {
+            console.log(err)
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json(error)
+    }
+})
 
 app.use(erroMiddleware)
