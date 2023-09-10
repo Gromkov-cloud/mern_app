@@ -7,6 +7,14 @@ const path = require("path")
 
 const app = express()
 
+app.use(express.json({ limit: "100mb" }))
+app.use(express.urlencoded({ extended: true, limit: "100mb" }))
+app.use(cookieParser())
+app.use(cors({
+    credentials: true,
+    origin: "http://localhost:5173"
+}))
+
 const appStart = async () => {
     try {
         await mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -19,21 +27,11 @@ const appStart = async () => {
 }
 appStart()
 
-app.use(express.json({ limit: "100mb" }))
-app.use(express.urlencoded({ extended: true, limit: "100mb" }))
-app.use(cookieParser())
-app.use(cors({
-    credentials: true,
-    origin: "http://localhost:5173"
-}))
-
-
 //ROUTES
 const modelRoute = require("./routes/model-router")
 const imageRoute = require("./routes/image-router")
 const authRoute = require("./routes/auth-router")
-const erroMiddleware = require("./middleware/erro-middleware")
-
+const errorMiddleware = require("./middleware/error-middleware")
 
 app.use("/api", modelRoute)
 app.use(imageRoute)
@@ -52,4 +50,4 @@ app.get("*", (req, res) => {
     }
 })
 
-app.use(erroMiddleware)
+app.use(errorMiddleware)

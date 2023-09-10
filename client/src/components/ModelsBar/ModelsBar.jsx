@@ -10,6 +10,7 @@ import { Container } from "@mui/material"
 
 import ModelsList from "../ModelsList/ModelsList"
 import DisplayMode from "../DisplayMode/DisplayMode"
+import ModelService from "../../services/ModelService"
 
 const ModelsBar = () => {
     const [isDrawerOpen, setDrawerOpen] = useState(false)
@@ -20,9 +21,8 @@ const ModelsBar = () => {
 
     const [models, setModels] = useState([])
     const getModels = async () => {
-        const response = await fetch("/api/models?isActive=true")
-        const data = await response.json()
-        setModels(data)
+        const response = await ModelService.fetchModels()
+        setModels(response.data)
     }
 
     useEffect(() => {

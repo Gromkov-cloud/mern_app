@@ -6,11 +6,7 @@ import List from "@mui/material/List"
 import ListItem from "@mui/material/ListItem"
 import ListItemButton from "@mui/material/ListItemButton"
 
-import styles from "./ModelsList.module.css"
-
 const ModelsList = ({ list, listBtnClickHandle }) => {
-    const navLinkRef = useRef(null)
-
     return (
         <>
             <Box

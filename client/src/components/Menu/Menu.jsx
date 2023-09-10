@@ -12,10 +12,10 @@ import Tooltip from "@mui/material/Tooltip"
 import MenuItem from "@mui/material/MenuItem"
 import ViewInArRoundedIcon from "@mui/icons-material/ViewInArRounded"
 import { NavLink } from "react-router-dom"
+import authStore from "../../mobx-store/auth-store"
+import { observer } from "mobx-react-lite"
 
-const settings = ["Profile", "Account", "Dashboard", "Logout"]
-
-function ResponsiveAppBar() {
+const ResponsiveAppBar = observer(() => {
     const [anchorElNav, setAnchorElNav] = React.useState(null)
     const [anchorElUser, setAnchorElUser] = React.useState(null)
 
@@ -34,12 +34,19 @@ function ResponsiveAppBar() {
         setAnchorElUser(null)
     }
 
+    const handleLogOut = () => {
+        handleCloseUserMenu()
+        authStore.logOut()
+    }
+
+    const { isAuth } = authStore
+
     return (
         <AppBar position="static">
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
                     <ViewInArRoundedIcon
-                        fontSize="large"
+                        fontSize="medium"
                         sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}
                     />
 
@@ -48,6 +55,7 @@ function ResponsiveAppBar() {
                             display: { xs: "flex", md: "none" },
                         }}
                     >
+                        {/* BURGER ICON ---> */}
                         <IconButton
                             size="large"
                             aria-label="account of current user"
@@ -58,6 +66,9 @@ function ResponsiveAppBar() {
                         >
                             <MenuIcon />
                         </IconButton>
+                        {/* <---  BURGER ICON */}
+
+                        {/* MOBILE MENU ---> */}
                         <Menu
                             id="menu-appbar"
                             anchorEl={anchorElNav}
@@ -76,55 +87,46 @@ function ResponsiveAppBar() {
                                 display: { xs: "block", md: "none" },
                             }}
                         >
-                            <MenuItem onClick={handleCloseNavMenu}>
-                                <NavLink
-                                    to={"/"}
-                                    style={{
-                                        color: "black",
-                                        textDecoration: "none",
-                                    }}
-                                >
-                                    Root
-                                </NavLink>
-
-                                {/* <Typography textAlign="center">Root</Typography> */}
+                            <MenuItem
+                                onClick={handleCloseNavMenu}
+                                component={NavLink}
+                                to={"/"}
+                                style={{
+                                    color: "black",
+                                    textDecoration: "none",
+                                }}
+                            >
+                                Главная
                             </MenuItem>
 
-                            <MenuItem>
-                                <NavLink
-                                    to={"/model"}
-                                    style={{
-                                        color: "black",
-                                        textDecoration: "none",
-                                    }}
-                                >
-                                    model
-                                </NavLink>
+                            <MenuItem
+                                onClick={handleCloseNavMenu}
+                                component={NavLink}
+                                to={"/model"}
+                                style={{
+                                    color: "black",
+                                    textDecoration: "none",
+                                }}
+                            >
+                                Модели
                             </MenuItem>
-                            <MenuItem>
-                                <NavLink
+                            {!isAuth ? null : (
+                                <MenuItem
+                                    onClick={handleCloseNavMenu}
+                                    component={NavLink}
                                     to={"/admin"}
                                     style={{
                                         color: "black",
                                         textDecoration: "none",
                                     }}
                                 >
-                                    admin
-                                </NavLink>
-                            </MenuItem>
-                            <MenuItem>
-                                <NavLink
-                                    to={"/login"}
-                                    style={{
-                                        color: "black",
-                                        textDecoration: "none",
-                                    }}
-                                >
-                                    login
-                                </NavLink>
-                            </MenuItem>
+                                    Админка
+                                </MenuItem>
+                            )}
                         </Menu>
+                        {/* <---  MOBILE MENU */}
                     </Box>
+
                     <ViewInArRoundedIcon
                         fontSize="medium"
                         sx={{
@@ -132,6 +134,7 @@ function ResponsiveAppBar() {
                             mr: 1,
                         }}
                     />
+                    {/* DESKTOP MENU ---> */}
                     <Box
                         sx={{
                             flexGrow: 1,
@@ -141,49 +144,46 @@ function ResponsiveAppBar() {
                         <Button
                             onClick={handleCloseNavMenu}
                             sx={{ my: 2, color: "white", display: "block" }}
+                            component={NavLink}
+                            to={"/"}
+                            style={{
+                                color: "white",
+                                textDecoration: "none",
+                            }}
                         >
-                            <NavLink
-                                to={"/"}
-                                style={{
-                                    color: "white",
-                                    textDecoration: "none",
-                                }}
-                            >
-                                Root
-                            </NavLink>
+                            Главная
                         </Button>
                         <Button
                             onClick={handleCloseNavMenu}
                             sx={{ my: 2, color: "white", display: "block" }}
+                            component={NavLink}
+                            to={"/model"}
+                            style={{
+                                color: "white",
+                                textDecoration: "none",
+                            }}
                         >
-                            <NavLink
-                                to={"/model"}
-                                style={{
-                                    color: "white",
-                                    textDecoration: "none",
-                                }}
-                            >
-                                Models
-                            </NavLink>
+                            Модели
                         </Button>
-                        <Button
-                            onClick={handleCloseNavMenu}
-                            sx={{ my: 2, color: "white", display: "block" }}
-                        >
-                            <NavLink
+                        {!isAuth ? null : (
+                            <Button
+                                onClick={handleCloseNavMenu}
+                                sx={{ my: 2, color: "white", display: "block" }}
+                                component={NavLink}
                                 to={"/admin"}
                                 style={{
                                     color: "white",
                                     textDecoration: "none",
                                 }}
                             >
-                                Admin
-                            </NavLink>
-                        </Button>
+                                Админка
+                            </Button>
+                        )}
                     </Box>
+                    {/* <---  DESKTOP MENU */}
 
                     <Box sx={{ flexGrow: 0 }}>
-                        <Tooltip title="Open settings">
+                        <Tooltip>
                             <IconButton
                                 onClick={handleOpenUserMenu}
                                 sx={{ p: 0 }}
@@ -207,44 +207,36 @@ function ResponsiveAppBar() {
                             open={Boolean(anchorElUser)}
                             onClose={handleCloseUserMenu}
                         >
-                            <MenuItem onClick={handleCloseUserMenu}>
-                                <NavLink
-                                    to={"/"}
+                            {!isAuth ? (
+                                <MenuItem
+                                    onClick={handleCloseUserMenu}
+                                    component={NavLink}
+                                    to={"/login"}
                                     style={{
                                         color: "black",
                                         textDecoration: "none",
                                     }}
                                 >
-                                    Root
-                                </NavLink>
-                            </MenuItem>
-                            <MenuItem onClick={handleCloseUserMenu}>
-                                <NavLink
-                                    to={"/model"}
+                                    Войти
+                                </MenuItem>
+                            ) : (
+                                <MenuItem
+                                    onClick={handleLogOut}
+                                    component={NavLink}
+                                    to={"/login"}
                                     style={{
                                         color: "black",
                                         textDecoration: "none",
                                     }}
                                 >
-                                    model
-                                </NavLink>
-                            </MenuItem>
-                            <MenuItem onClick={handleCloseUserMenu}>
-                                <NavLink
-                                    to={"/admin"}
-                                    style={{
-                                        color: "black",
-                                        textDecoration: "none",
-                                    }}
-                                >
-                                    admin
-                                </NavLink>
-                            </MenuItem>
+                                    Выйти
+                                </MenuItem>
+                            )}
                         </Menu>
                     </Box>
                 </Toolbar>
             </Container>
         </AppBar>
     )
-}
+})
 export default ResponsiveAppBar
