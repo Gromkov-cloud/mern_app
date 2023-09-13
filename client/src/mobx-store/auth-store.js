@@ -37,6 +37,7 @@ class AuthStore {
         await AuthService.logout(this.login)
         this.setUserLogin("")
         this.setAuth(false)
+        console.log('logout')
     }
     refresh = async () => {
         this.setLoading(true)

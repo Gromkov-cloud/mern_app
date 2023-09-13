@@ -4,18 +4,18 @@ import Typography from "@mui/material/Typography"
 import Divider from "@mui/material/Divider"
 
 import ModelAccordionList from "./ModelAccordionList"
-
-const getModels = async (setData) => {
-    const response = await fetch("/api/models")
-    const data = await response.json()
-    setData(data)
-}
+import ModelService from "../../services/ModelService"
 
 const ModelAccordion = () => {
     const [models, setModels] = useState([])
 
     useEffect(() => {
-        getModels(setModels)
+        const fetchModels = async () => {
+            const models = await ModelService.fetchModels()
+            setModels(models.data)
+            console.log(models)
+        }
+        fetchModels()
     }, [])
 
     return (
