@@ -1,0 +1,20 @@
+.breadcrumbs_list {
+    display: flex;
+    gap: 5px;
+}
+.breadcrumbs_link {
+    color: #000;
+
+    font-family: Inter;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    text-decoration: unset;
+
+    transition: all 0.2s ease-in;
+}
+
+.breadcrumbs_link:hover {
+    color: #747474;
+}
