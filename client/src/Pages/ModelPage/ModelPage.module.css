@@ -4,3 +4,15 @@
 
     height: calc(100vh - 68.5px);
 }
+
+@media (max-width: 900px) {
+    .model_frame {
+        height: calc(100vh - 64px);
+    }
+}
+
+@media (max-width: 600px) {
+    .model_frame {
+        height: calc(100vh - 56px);
+    }
+}

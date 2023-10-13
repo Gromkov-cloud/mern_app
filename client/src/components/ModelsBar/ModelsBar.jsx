@@ -6,23 +6,54 @@ import Drawer from "@mui/material/Drawer"
 import Button from "@mui/material/Button"
 import IconButton from "@mui/material/IconButton"
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown"
-import { Container } from "@mui/material"
+import {
+    Box,
+    Container,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+} from "@mui/material"
 
 import ModelsList from "../ModelsList/ModelsList"
 import DisplayMode from "../DisplayMode/DisplayMode"
 import ModelService from "../../services/ModelService"
+import { useNavigate, useLocation } from "react-router-dom"
+import { API_URL } from "../../http"
+import ModelQr from "../ModelQr/ModelQr"
 
 const ModelsBar = () => {
+    const location = useLocation()
     const [isDrawerOpen, setDrawerOpen] = useState(false)
+    const [models, setModels] = useState([])
+    const [open, setOpen] = useState(false)
+    const isModelSelected = location.pathname.length > 6
 
     const toggleDrawer = () => {
         setDrawerOpen(!isDrawerOpen)
     }
 
-    const [models, setModels] = useState([])
     const getModels = async () => {
-        const response = await ModelService.fetchModels()
+        const response = await ModelService.fetchModels("?isActive=true")
         setModels(response.data)
+    }
+
+    const handleOpen = () => {
+        setOpen(true)
+    }
+
+    const handleClose = () => {
+        setOpen(false)
+    }
+
+    const applyButtonClickHandle = () => {
+        setOpen(false)
+    }
+
+    const cancelButtonClickHandle = () => {
+        setOpen(false)
+        toggleCheckBoxSelect(false)
     }
 
     useEffect(() => {
@@ -49,11 +80,42 @@ const ModelsBar = () => {
                     variant="contained"
                     onClick={toggleDrawer}
                     sx={{ minWidth: "fit-content" }}
+                    size="small"
                 >
-                    Выбрать модель
+                    Выбор модели
+                </Button>
+                <Button
+                    variant="contained"
+                    onClick={handleOpen}
+                    sx={{ minWidth: "fit-content" }}
+                    size="small"
+                    disabled={!isModelSelected}
+                >
+                    Открыть QR
                 </Button>
                 <DisplayMode />
             </Container>
+
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">QR код модели</DialogTitle>
+                <DialogContent sx={{ padding: 0 }}>
+                    {isModelSelected ? (
+                        <ModelQr modelId={location.pathname.slice(7)} />
+                    ) : (
+                        "Выберете модель"
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={applyButtonClickHandle} autoFocus>
+                        Закрыть
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             <Drawer
                 anchor={"bottom"}

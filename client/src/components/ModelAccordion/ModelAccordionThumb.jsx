@@ -1,11 +1,12 @@
 import Box from "@mui/material/Box"
 
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
+import { API_URL } from "../../http"
 
 const ModelAccordionThumb = ({ imgSrc }) => {
+    console.log(imgSrc)
     return imgSrc ? (
-        // <img src={`/api/image/${imgSrc}`} alt="" />
-        "img"
+        <img src={`${API_URL}/model-qr/${imgSrc}`} alt="" />
     ) : (
         <Box
             width={"100%"}

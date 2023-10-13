@@ -2,9 +2,9 @@ import Container from "@mui/material/Container"
 import Grid from "@mui/material/Grid"
 
 import Menu from "../../components/Menu/Menu"
-import Sidebar from "../../components/Sidebar/Sidebar"
 import AdminPageContentPanel from "./AdminPageContentPanel"
 import PageTitle from "./PageTitle"
+import { Box } from "@mui/material"
 
 const AdminPage = () => {
     return (
@@ -21,7 +21,6 @@ const AdminPage = () => {
                 <Menu />
                 <PageTitle />
 
-                {/* SIDEBAR, CONTENT PANEL */}
                 <Container
                     maxWidth="false"
                     sx={(theme) => ({
@@ -29,21 +28,16 @@ const AdminPage = () => {
                         flexGrow: 3,
                     })}
                 >
-                    <Container maxWidth="xl" sx={{ paddingBottom: "30px" }}>
-                        <Grid
-                            container
-                            columnSpacing={4}
-                            sx={{
-                                color: "#000",
-                            }}
-                        >
-                            <Grid item xs={3}>
-                                <Sidebar />
-                            </Grid>
-                            <Grid item xs={9}>
-                                <AdminPageContentPanel />
-                            </Grid>
-                        </Grid>
+                    <Container
+                        maxWidth={"xl"}
+                        sx={{
+                            paddingBottom: "30px",
+                            color: "#000",
+                            margin: "0 auto",
+                            padding: "0",
+                        }}
+                    >
+                        <AdminPageContentPanel />
                     </Container>
                 </Container>
             </Container>

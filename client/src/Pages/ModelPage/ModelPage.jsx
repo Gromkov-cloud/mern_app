@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom"
-import { Suspense } from "react"
+import { Suspense, useState } from "react"
 
 import Menu from "../../components/Menu/Menu"
 import Sidebar from "../../components/ModelsBar/ModelsBar"
@@ -9,9 +9,13 @@ import CircularProgress from "@mui/material/CircularProgress"
 
 import styles from "./ModelPage.module.css"
 import { Typography } from "@mui/material"
+import { observer } from "mobx-react-lite"
+import modelPageStore from "../../mobx-store/model-page-store"
+import ModelAR from "./ModelAR"
 
-const ModelPage = () => {
+const ModelPage = observer(() => {
     const modelName = useParams().id
+    const isDisplayModeAR = modelPageStore.isDisplayModeAR
 
     const ModelProgress = () => {
         return (
@@ -46,17 +50,29 @@ const ModelPage = () => {
     return (
         <>
             <Menu />
-            <Container maxWidth="xl" className={styles.model_frame}>
+            <Container
+                maxWidth="false"
+                disableGutters
+                className={styles.model_frame}
+            >
                 <Sidebar />
                 {modelName ? (
-                    <Suspense fallback={<ModelProgress />}>
-                        <Model id={modelName} />
-                    </Suspense>
+                    <>
+                        {isDisplayModeAR ? (
+                            <Suspense fallback={<ModelProgress />}>
+                                <ModelAR />
+                            </Suspense>
+                        ) : (
+                            <Suspense fallback={<ModelProgress />}>
+                                <Model id={modelName} />
+                            </Suspense>
+                        )}
+                    </>
                 ) : (
                     <ModelPagePlaceholder />
                 )}
             </Container>
         </>
     )
-}
+})
 export default ModelPage

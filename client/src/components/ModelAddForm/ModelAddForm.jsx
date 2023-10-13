@@ -1,9 +1,10 @@
 import { useForm, Controller } from "react-hook-form"
 import TextField from "@mui/material/TextField"
 import FileLoader from "../FileLoader/FileLoader"
-import { Alert, Box, Divider, Snackbar, Typography } from "@mui/material"
+import { Alert, Box, Divider, Grid, Snackbar, Typography } from "@mui/material"
 import LoadingButton from "@mui/lab/LoadingButton"
 import { useState } from "react"
+import ModelService from "../../services/ModelService"
 
 const createValidFormData = (data, id) => {
     const isDataEmpty = Boolean(
@@ -46,22 +47,26 @@ const ModelAddForm = () => {
     const onFormSubmit = async (data) => {
         const formData = createValidFormData(data)
 
-        console.log(formData)
+        try {
+            setLoading(true)
+            const res = await ModelService.addModel(formData)
 
-        setLoading(true)
-        const response = await fetch("/api/model", {
-            method: "POST",
-            body: formData,
-        })
-        setLoading(false)
-        setSuccess(response.ok)
-        setOpen(true)
+            if (!(res.status === 200)) {
+                setSuccess(false)
+                setOpen(true)
+                return
+            }
 
-        if (response.ok) {
+            setSuccess(true)
+            setOpen(true)
             reset()
+        } catch (error) {
+            console.log(error)
+            setSuccess(false)
+            setOpen(true)
+        } finally {
+            setLoading(false)
         }
-
-        console.log(response)
     }
 
     const handleClose = (event, reason) => {
@@ -107,34 +112,17 @@ const ModelAddForm = () => {
                             />
                         )}
                     />
-                    <Controller
-                        name="modelDescription"
-                        control={control}
-                        render={({ field: { onChange, value = "" } }) => (
-                            <TextField
-                                onChange={onChange}
-                                value={value}
-                                id="standard-textarea"
-                                label="Описание модели"
-                                multiline
-                                rows={2}
-                                variant="filled"
-                                sx={{ color: "#000" }}
-                            />
-                        )}
-                    />
                 </Box>
 
-                <Box
+                <Grid
+                    container
+                    justifyContent="center"
+                    gap={"15px"}
                     sx={{
-                        display: "flex",
-                        alignItems: "flex-start",
-
-                        gap: "20px",
                         m: "20px 0",
                     }}
                 >
-                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    <Grid item>
                         <Controller
                             name="modelFile"
                             control={control}
@@ -148,21 +136,23 @@ const ModelAddForm = () => {
                                 />
                             )}
                         />
-                    </Box>
-                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    </Grid>
+                    <Grid item>
                         <Controller
-                            name="modelThumbnail"
+                            name="modelQR"
                             control={control}
+                            rules={{ required: "Выберете картинку QR кода" }}
                             render={({ field: { onChange, value = "" } }) => (
                                 <FileLoader
                                     setFile={onChange}
                                     file={value}
-                                    title={"Изображение миниатюры"}
+                                    title={"QR код *"}
+                                    error={errors.modelQR}
                                 />
                             )}
                         />
-                    </Box>
-                </Box>
+                    </Grid>
+                </Grid>
                 <LoadingButton
                     loading={loading}
                     fullWidth

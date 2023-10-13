@@ -10,6 +10,7 @@ const Model = () => {
     const { id } = useParams()
     console.log(id)
     let gltf = useLoader(GLTFLoader, `/api/model/${id}`)
+    console.log(gltf)
 
     return (
         <div className={styles.model_container}>

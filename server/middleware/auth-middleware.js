@@ -5,9 +5,8 @@ const tokenService = require("../services/token-service");
 const authMiddleware = async (req, res, next) => {
     try {
         const accessToken = req.headers.authorization.split(" ")[1]
-        console.log("access token |auth-middleware|: " + accessToken)
         if (!accessToken) {
-            console.log("нет асес токена")
+            console.log("нет асес токена в headers.authorization |auth-middleware|")
             return next(ApiError.UnauthorizedError());
         }
         const payload = tokenService.verifyAccessToken(accessToken)
@@ -20,7 +19,6 @@ const authMiddleware = async (req, res, next) => {
             console.log("в дб нет access токена |auth-middleware|")
             return next(ApiError.UnauthorizedError())
         }
-
         res.isOwner = true
         next()
     } catch (error) {

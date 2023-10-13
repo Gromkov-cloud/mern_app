@@ -18,7 +18,7 @@ const FileLoader = ({ setFile, file, title, error }) => {
     }
 
     return (
-        <>
+        <div className={styles.file_loader__container}>
             <span className={styles.input_title}>{title}</span>
             <div className={styles.file_loader}>
                 <input
@@ -37,14 +37,14 @@ const FileLoader = ({ setFile, file, title, error }) => {
                 </button>
                 {file?.name ? (
                     <span className={styles.file_name__active}>
-                        {file.name}
+                        {file.name.slice(0, 20)}
                     </span>
                 ) : (
                     <span className={styles.file_name}>Выберете файл...</span>
                 )}
             </div>
             <span style={{ color: "#d32f2f" }}>{error?.message}</span>
-        </>
+        </div>
     )
 }
 

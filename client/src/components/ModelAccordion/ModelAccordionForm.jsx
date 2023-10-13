@@ -1,7 +1,6 @@
 import { Controller, useForm } from "react-hook-form"
 
 import Box from "@mui/material/Box"
-import Button from "@mui/material/Button"
 import Grid from "@mui/material/Grid"
 import Switch from "@mui/material/Switch"
 import TextField from "@mui/material/TextField"
@@ -9,9 +8,48 @@ import Typography from "@mui/material/Typography"
 
 import FileLoader from "../FileLoader/FileLoader"
 import ModelAccordionThumb from "./ModelAccordionThumb"
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import { Alert, Snackbar } from "@mui/material"
 import LoadingButton from "@mui/lab/LoadingButton/LoadingButton"
+import ModelService from "../../services/ModelService"
+import ModelPreview from "../ModelPreview/ModelPreview"
+import { API_URL } from "../../http"
+
+const Popup = ({
+    text,
+    isPopupOpen,
+    setPopupOpen,
+    severity,
+    position,
+    duration,
+}) => {
+    const handleClose = (event, reason) => {
+        if (reason === "clickaway") {
+            return
+        }
+        setPopupOpen(false)
+    }
+    return (
+        <Snackbar
+            open={isPopupOpen}
+            autoHideDuration={duration || 6000}
+            onClose={handleClose}
+            anchorOrigin={
+                position
+                    ? { ...position }
+                    : { vertical: "bottom", horizontal: "right" }
+            }
+        >
+            <Alert
+                onClose={handleClose}
+                severity={severity || "error"}
+                sx={{ width: "100%" }}
+            >
+                {text}
+            </Alert>
+        </Snackbar>
+    )
+}
 
 const createValidFormData = (data, id) => {
     const isDataEmpty = Boolean(
@@ -40,12 +78,14 @@ const createValidFormData = (data, id) => {
 }
 
 const ModelAccordionForm = ({ model, setDeleted, isDeleted }) => {
-    const [saveSnackOpen, setSaveSnackOpen] = useState(false)
-    const [isSaveSuccess, setSaveSuccess] = useState(true)
-    const [deleteSnackOpen, setDeleteSnackOpen] = useState(false)
-    const [isDeleteSuccess, setDeleteSuccess] = useState(true)
+    const [isNameSaveBtnLoading, setNameSaveBtnLoading] = useState(false)
     const [isDeleteBtnLoading, setDeleteBtnLoading] = useState(false)
     const [isSaveBtnLoading, setSaveBtnLoading] = useState(false)
+
+    const [popupText, setPopupText] = useState("")
+    const [isPopupOpen, setPopupOpen] = useState(false)
+    const [popupSeverity, setPopupSeverity] = useState("success")
+    const [modelUrl, setModelUrl] = useState()
 
     const {
         handleSubmit,
@@ -54,145 +94,202 @@ const ModelAccordionForm = ({ model, setDeleted, isDeleted }) => {
     } = useForm()
 
     const onFormSubmit = async (data) => {
+        console.log(data)
         const formData = createValidFormData(data, model._id)
 
-        console.log(formData)
         if (!formData) {
             console.log("no data")
             return
         }
 
-        setSaveBtnLoading(true)
-        const response = await fetch(`/api/model/update/${model._id}`, {
-            method: "POST",
-            body: formData,
-        })
-        setSaveBtnLoading(false)
-        setSaveSuccess(response.ok)
-        setSaveSnackOpen(true)
+        try {
+            setSaveBtnLoading(true)
+            const response = await ModelService.updateModel(model._id, formData)
+            if (!(response.status === 200)) {
+                popupHandlerOpen(
+                    "Модель не удалось обновить, попробуйте позже",
+                    "error"
+                )
+                return
+            }
 
-        console.log(await response.json())
+            popupHandlerOpen("Модель успешно обновлена!", "success")
+        } catch (error) {
+            console.log(error.response)
+            popupHandlerOpen(
+                "Модель не удалось обновить, попробуйте позже",
+                "error"
+            )
+        } finally {
+            setSaveBtnLoading(false)
+        }
     }
 
     const deleteBtnClickHandle = async (modelId) => {
-        setDeleteBtnLoading(true)
-        const response = await fetch(`/api/model/${modelId}`, {
-            method: "DELETE",
-        })
-        setDeleteBtnLoading(false)
-        setDeleteSuccess(response.ok)
-        setDeleteSnackOpen(true)
-        setDeleted(true)
-
-        console.log(await response.body.json)
+        try {
+            setDeleteBtnLoading(true)
+            const response = await ModelService.deleteModel(modelId)
+            if (!(response.status === 200)) {
+                setDeleteSuccess(false)
+                return
+            }
+            popupHandlerOpen("Модель успешно удалена", "success")
+            setDeleted(true)
+        } catch (error) {
+            console.log(error.response)
+            popupHandlerOpen(
+                "При удалении произошла ошибка, попробуйте позже",
+                "error"
+            )
+        } finally {
+            setDeleteBtnLoading(false)
+        }
     }
 
-    const handleSaveSnackClose = (event, reason) => {
-        if (reason === "clickaway") {
-            return
-        }
-
-        setSaveSnackOpen(false)
-    }
-    const handleDeleteSnackClose = (event, reason) => {
-        if (reason === "clickaway") {
-            return
-        }
-
-        setDeleteSnackOpen(false)
+    const popupHandlerOpen = (text, severity) => {
+        setPopupText(text)
+        setPopupSeverity(severity)
+        setPopupOpen(true)
     }
 
     return (
         <>
             <form onSubmit={handleSubmit(onFormSubmit)}>
-                <Grid container spacing={2}>
-                    {/* MODEL NAME AND MODEL THUMB CONTAINER ---> */}
-                    <Grid item xs={4}>
-                        <Box>
-                            {/* MODEL NAME INPUT ---> */}
-                            <Controller
-                                name="modelName"
-                                control={control}
-                                // rules={{
-                                //     required: "Введите название",
-                                // }}
-                                render={({
-                                    field: {
-                                        onChange,
-                                        value = model.name || "",
-                                    },
-                                }) => (
-                                    <TextField
-                                        onChange={onChange}
-                                        value={value}
-                                        id="standard-basic"
-                                        label="Название модели"
-                                        variant="outlined"
-                                        sx={{
-                                            color: "#000",
-                                            width: "100%",
-                                        }}
-                                        helperText={errors.modelName?.message}
-                                        error={!!errors.modelName}
-                                    />
-                                )}
-                            />
-                            {/* <---  MODEL NAME INPUT */}
-
-                            {/* MODEL THUMB INPUT---> */}
-                            <Typography
-                                sx={(theme) => ({
-                                    fontSize: "16px",
-                                    color: theme.palette.text.secondary,
-                                    marginTop: "10px",
-                                })}
-                            >
-                                Миниатюра
-                            </Typography>
-                            <ModelAccordionThumb imgSrc={model.s3.image} />
-                            {/* <---  MODEL THUMB INPUT*/}
-                        </Box>
-                    </Grid>
-                    {/* <---  MODEL NAME AND MODEL THUMB CONTAINER */}
-
-                    {/* MODEL DESCRIPTION INPUT CONTAINER ---> */}
-                    <Grid item xs={8}>
-                        <Controller
-                            name="description"
-                            control={control}
-                            render={({
-                                field: {
-                                    onChange,
-                                    value = model.description || "",
-                                },
-                            }) => (
-                                <TextField
-                                    onChange={onChange}
-                                    value={value}
-                                    id="standard-textarea"
-                                    label="Описание модели"
-                                    multiline
-                                    rows={9}
-                                    variant="outlined"
-                                    sx={{ color: "#000", width: "100%" }}
-                                />
-                            )}
-                        />
-                    </Grid>
-                    {/* <---  MODEL DESCRIPTION INPUT CONTAINER */}
-                </Grid>
                 <Box
                     sx={{
                         display: "flex",
-                        alignItems: "flex-end",
+                        flexDirection: "column",
+                        gap: "10px",
+                    }}
+                >
+                    <Controller
+                        name="modelName"
+                        control={control}
+                        render={({
+                            field: { onChange, value = model.name || "" },
+                        }) => (
+                            <TextField
+                                onChange={onChange}
+                                value={value}
+                                id="standard-basic"
+                                variant="outlined"
+                                label="Название модели на сайте"
+                                helperText={errors.modelName?.message}
+                                error={!!errors.modelName}
+                                sx={{
+                                    color: "#000",
+                                    width: "100%",
+                                }}
+                            />
+                        )}
+                    />
+                    <LoadingButton
+                        loading={isNameSaveBtnLoading}
+                        fullWidth
+                        variant="contained"
+                        sx={{ height: "100%" }}
+                        onClick={() => console.log("haloworld")}
+                        disabled={false}
+                    >
+                        Сохранить название модели
+                    </LoadingButton>
+                    <Box sx={{ width: "fit-content", margin: "0 auto" }}>
+                        <Typography
+                            sx={(theme) => ({
+                                fontSize: "16px",
+                                color: theme.palette.text.secondary,
+                                marginTop: "10px",
+                            })}
+                        >
+                            QR код
+                        </Typography>
+                        <Box sx={{ maxWidth: "300px" }}>
+                            {model._id ? (
+                                <img
+                                    src={`${API_URL}/model-qr/${model._id}`}
+                                    alt="qr код"
+                                />
+                            ) : (
+                                "Добавьте QR код"
+                            )}
+                        </Box>
+                    </Box>
+                    {/* <input
+                        type="file"
+                        onChange={(e) => {
+                            setModelUrl(URL.createObjectURL(e.target.files[0]))
+                            console.log(e.target.files)
+                        }}
+                    />
+                    {modelUrl ? (
+                        <Suspense fallback={"await..."}>
+                            <ModelPreview modelUrl={modelUrl} />
+                        </Suspense>
+                    ) : (
+                        "change the model"
+                    )} */}
+                    <LoadingButton
+                        // loading={isNameSaveBtnLoading}
+                        fullWidth
+                        variant="outlined"
+                        onClick={() => console.log("haloworld")}
+                        disabled={false}
+                    >
+                        Изменить QR код
+                    </LoadingButton>
+                    <LoadingButton
+                        // loading={isNameSaveBtnLoading}
+                        fullWidth
+                        variant="outlined"
+                        onClick={() => console.log("haloworld")}
+                        disabled={false}
+                    >
+                        Предпросмотр файла 3D модели
+                    </LoadingButton>
+                    <LoadingButton
+                        // loading={isNameSaveBtnLoading}
+                        fullWidth
+                        variant="outlined"
+                        onClick={() => console.log("haloworld")}
+                        disabled={false}
+                    >
+                        Изменить файл 3D модели
+                    </LoadingButton>
+                    <LoadingButton
+                        // loading={isNameSaveBtnLoading}
+                        fullWidth
+                        variant="outlined"
+                        onClick={() => console.log("haloworld")}
+                        disabled={false}
+                    >
+                        Активировать модель
+                    </LoadingButton>
+                    <LoadingButton
+                        loading={isDeleteBtnLoading}
+                        fullWidth
+                        variant="contained"
+                        onClick={() => deleteBtnClickHandle(model._id)}
+                        disabled={isSaveBtnLoading || isDeleted}
+                    >
+                        Удалить модель
+                    </LoadingButton>
+                </Box>
+                <Grid
+                    container
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-around",
                         gap: "20px",
+                        margin: "20px 0 0 0",
                     }}
                 >
                     {/* MODEL FILE INPUT ---> */}
-                    <Box
+                    <Grid
+                        item
                         sx={{
                             flexGrow: 2,
-                            width: "max-content",
+                            maxWidth: "fit-content",
                             marginTop: "15px",
                         }}
                     >
@@ -212,13 +309,14 @@ const ModelAccordionForm = ({ model, setDeleted, isDeleted }) => {
                                 />
                             )}
                         />
-                    </Box>
+                    </Grid>
                     {/* <---  MODEL FILE INPUT */}
                     {/* MODEL THUMB INPUT ---> */}
-                    <Box
+                    <Grid
+                        item
                         sx={{
                             flexGrow: 2,
-                            width: "max-content",
+                            maxWidth: "fit-content",
                             marginTop: "15px",
                         }}
                     >
@@ -234,26 +332,37 @@ const ModelAccordionForm = ({ model, setDeleted, isDeleted }) => {
                                 <FileLoader
                                     setFile={onChange}
                                     file={value}
-                                    title={"Изменить миниатюру модели"}
+                                    title={"Изменить qr код модели"}
                                 />
                             )}
                         />
-                    </Box>
+                    </Grid>
                     {/* <---  MODEL THUMB INPUT */}
 
                     {/* SWITCHER ---> */}
-                    <Box
-                        sx={{
-                            maxWidth: "max-content",
-                            width: "100%",
-                        }}
-                    >
-                        <Typography
-                            sx={(theme) => ({
-                                fontSize: "16px",
-                                color: theme.palette.text.secondary,
-                            })}
+                    <Grid item>
+                        <Grid
+                            container
+                            justifyContent={"center"}
+                            alignItems={"center"}
+                            direction={"column"}
+                            sx={{
+                                maxWidth: "max-content",
+                                width: "100%",
+                                borderRadius: "5px",
+                                border: "1px solid gray",
+                            }}
                         >
+                            <Typography
+                                sx={(theme) => ({
+                                    fontSize: "16px",
+                                    color: theme.palette.text.secondary,
+                                    borderBottom: "1px solid gray",
+                                    padding: "5px",
+                                })}
+                            >
+                                Активировать модель
+                            </Typography>
                             <Controller
                                 name="isActive"
                                 control={control}
@@ -271,69 +380,18 @@ const ModelAccordionForm = ({ model, setDeleted, isDeleted }) => {
                                     />
                                 )}
                             />
-                            Активировать модель
-                        </Typography>
-                    </Box>
+                        </Grid>
+                    </Grid>
+
                     {/* <---  SWITCHER */}
-                </Box>
-
-                {/* MODEL DELETE BTN ---> */}
-                <LoadingButton
-                    loading={isDeleteBtnLoading}
-                    fullWidth
-                    variant="outlined"
-                    sx={{ m: "15px 0" }}
-                    onClick={() => deleteBtnClickHandle(model._id)}
-                    disabled={isSaveBtnLoading || isDeleted}
-                >
-                    Удалить модель
-                </LoadingButton>
-                {/* <---  MODEL DELETE BTN */}
-
-                {/* FORM SUBMIT BTN ---> */}
-                <LoadingButton
-                    loading={isSaveBtnLoading}
-                    fullWidth
-                    variant="contained"
-                    type="submit"
-                    disabled={isDeleteBtnLoading || isDeleted}
-                >
-                    Сохранить изменения
-                </LoadingButton>
-                {/* <---  FORM SUBMIT BTN */}
+                </Grid>
             </form>
-            <Snackbar
-                open={saveSnackOpen}
-                autoHideDuration={6000}
-                onClose={handleSaveSnackClose}
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-            >
-                <Alert
-                    onClose={handleSaveSnackClose}
-                    severity={isSaveSuccess ? "success" : "error"}
-                    sx={{ width: "100%" }}
-                >
-                    {isSaveSuccess
-                        ? "Модель обновлена"
-                        : "Произошла ошибка, попробуйте еще раз"}
-                </Alert>
-            </Snackbar>
-            <Snackbar
-                open={deleteSnackOpen}
-                autoHideDuration={6000}
-                onClose={handleDeleteSnackClose}
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-            >
-                <Alert
-                    onClose={handleDeleteSnackClose}
-                    severity={isDeleteSuccess ? "success" : "error"}
-                    sx={{ width: "100%" }}
-                >
-                    {isDeleteSuccess
-                        ? "Модель успешно удалена"
-                        : "Произошла ошибка, попробуйте еще раз"}
-                </Alert>
-            </Snackbar>
+            <Popup
+                text={popupText}
+                isPopupOpen={isPopupOpen}
+                setPopupOpen={setPopupOpen}
+                severity={popupSeverity}
+            />
         </>
     )
 }

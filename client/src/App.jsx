@@ -3,8 +3,6 @@ import { Routes, Route } from "react-router-dom"
 import RootPage from "./Pages/RootPage/RootPage"
 import AdminPage from "./Pages/AdminPage/AdminPage"
 import ModelPage from "./Pages/ModelPage/ModelPage"
-import ModelAddPage from "./Pages/ModelPage/ModelAddPage"
-import ModelSettingsPage from "./Pages/ModelSettingsPage/ModelSettingsPage"
 
 import LoginPage from "./Pages/LoginPage/LoginPage"
 import { useEffect } from "react"
@@ -15,7 +13,7 @@ import { CircularProgress } from "@mui/material"
 const App = observer(() => {
     useEffect(() => {
         const checkAuth = async () => {
-            const res = await authStore.checkAuth()
+            await authStore.checkAuth()
         }
         checkAuth()
     }, [])
@@ -34,11 +32,6 @@ const App = observer(() => {
             <Routes>
                 <Route path="/admin/*" element={<AdminPage />} />
                 <Route path="/model/:id" element={<ModelPage />} />
-                <Route
-                    path="/model-settings/:id"
-                    element={<ModelSettingsPage />}
-                />
-                <Route path="/model-add" element={<ModelAddPage />} />
                 <Route path="/model" element={<ModelPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/" element={<RootPage />} />

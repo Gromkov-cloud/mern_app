@@ -23,11 +23,11 @@ const pickFiles = (files, reqBody) => {
                 }
                 s3Files.model = { ...model }
             } else {
-                const image = {
+                const qr = {
                     "fileName": file.originalname,
                     "s3Name": file.key
                 }
-                s3Files.image = { ...image }
+                s3Files.qr = { ...qr }
             }
         });
         reqBody.s3 = { ...s3Files }
@@ -98,6 +98,7 @@ class ModelController {
     async getModel(req, res) {
 
         const model = await Model.findById(req.params.id)
+        console.log(model)
 
         const params = {
             Bucket: process.env.S3_BUCKET_NAME,
@@ -130,35 +131,40 @@ class ModelController {
             isActive: true,
             s3: {
                 model: req.files[0].key,
-                image: req.files[1]?.key || null
+                image: null,
+                qr: req.files[1].key
             }
         }
         const model = new Model(modelDto)
         const result = await model.save()
         res.status(200).json({ "result": result })
     }
+    // async updateModel(req, res) {
+
+    //     const oldModel = await Model.findById(req.body.id)
+    //     const data = pickFiles(req.files, req.body)
+    //     const modelDto = getModelDTO(data, oldModel)
+    //     modelDto.updateDate = new Date()
+
+    //     const result = await Model.updateOne({ "_id": new ObjectId(req.body.id) }, modelDto)
+
+    //     if (data.s3) {
+    //         s3Service.s3.deleteObjects(getDeleteOptions(data, oldModel), function (err, data) {
+    //             if (data) {
+    //                 console.log("File successfully deleted", data);
+    //             } else {
+    //                 console.log("Check with error message " + err);
+    //             }
+    //         });
+    //     }
+
+    //     res.json(result)
+    // }
+
     async updateModel(req, res) {
-
-        const oldModel = await Model.findById(req.body.id)
-
-        const data = pickFiles(req.files, req.body)
-        const modelDto = getModelDTO(data, oldModel)
-        modelDto.updateDate = new Date()
-
-        const result = await Model.updateOne({ "_id": new ObjectId(req.body.id) }, modelDto)
-
-        if (data.s3) {
-            s3Service.s3.deleteObjects(getDeleteOptions(data, oldModel), function (err, data) {
-                if (data) {
-                    console.log("File successfully deleted", data);
-                } else {
-                    console.log("Check with error message " + err);
-                }
-            });
-        }
-
-        res.json(result)
+        res.json({ "missage": "sosa" })
     }
+
     async deleteModel(req, res) {
         const id = req.params.id
 
@@ -185,6 +191,27 @@ class ModelController {
         const info = await Model.findById(id)
         console.log(info)
         res.status(200).json(info)
+    }
+
+    async getModelQr(req, res) {
+        const model = await Model.findById(req.params.id)
+        console.log(model)
+
+        const params = {
+            Bucket: process.env.S3_BUCKET_NAME,
+            Key: model.s3.qr
+        };
+
+
+        const readStream = S3Service.s3.getObject(params).createReadStream();
+
+        readStream.on('data', (data) => {
+            res.write(data);
+        });
+
+        readStream.on('end', () => {
+            res.end();
+        });
     }
 }
 

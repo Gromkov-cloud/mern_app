@@ -13,7 +13,6 @@ const ModelAccordion = () => {
         const fetchModels = async () => {
             const models = await ModelService.fetchModels()
             setModels(models.data)
-            console.log(models)
         }
         fetchModels()
     }, [])

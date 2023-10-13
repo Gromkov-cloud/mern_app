@@ -12,7 +12,8 @@ const models = new Schema({
     isActive: Boolean,
     s3: {
         model: String,
-        image: String
+        image: String,
+        qr: String
     },
 })
 

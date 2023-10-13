@@ -56,16 +56,14 @@ class AuthStore {
     checkAuth = async () => {
         this.setLoading(true)
         try {
-            console.log("ПРОВЕРКА АВТОРИЗАЦИИ |auth-store|")
             const res = await AuthService.checkAuth()
-            console.log(res)
             if (!res?.data?.login) {
                 return null
             }
             this.userLogin = res.data.login
             this.setAuth(true)
         } catch (error) {
-            // console.log(error)
+            console.log(error)
         } finally {
             this.setLoading(false)
         }

@@ -20,6 +20,7 @@
         "@react-three/fiber": "^8.12.2",
         "@react-three/gltfjsx": "^4.3.4",
         "@types/three": "^0.150.2",
+        "aframe": "^1.4.2",
         "axios": "^1.4.0",
         "dotenv": "^16.3.1",
         "mobx": "^6.10.0",
@@ -28,8 +29,7 @@
         "react-dom": "^18.2.0",
         "react-hook-form": "^7.43.9",
         "react-router-dom": "^6.10.0",
-        "styled-components": "^6.0.0-rc.1",
-        "three": "^0.151.3"
+        "styled-components": "^6.0.0-rc.1"
     },
     "devDependencies": {
         "@types/react": "^18.0.28",

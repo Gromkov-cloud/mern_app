@@ -1,11 +1,11 @@
 import { Box, IconButton, Menu, MenuItem } from "@mui/material"
 import MenuIcon from "@mui/icons-material/Menu"
+import ViewInArRoundedIcon from "@mui/icons-material/ViewInArRounded"
+
 import { NavLink } from "react-router-dom"
-import authStore from "../../mobx-store/auth-store"
 import { useState } from "react"
 
-const MobileMenuLayout = () => {
-    const { isAuth } = authStore
+const MobileMenuLayout = ({ routes }) => {
     const [anchorElNav, setAnchorElNav] = useState(null)
 
     const handleOpenNavMenu = (event) => {
@@ -52,44 +52,31 @@ const MobileMenuLayout = () => {
                         display: { xs: "block", md: "none" },
                     }}
                 >
-                    <MenuItem
-                        onClick={handleCloseNavMenu}
-                        component={NavLink}
-                        to={"/"}
-                        style={{
-                            color: "black",
-                            textDecoration: "none",
-                        }}
-                    >
-                        Главная
-                    </MenuItem>
-
-                    <MenuItem
-                        onClick={handleCloseNavMenu}
-                        component={NavLink}
-                        to={"/model"}
-                        style={{
-                            color: "black",
-                            textDecoration: "none",
-                        }}
-                    >
-                        Модели
-                    </MenuItem>
-                    {!isAuth ? null : (
-                        <MenuItem
-                            onClick={handleCloseNavMenu}
-                            component={NavLink}
-                            to={"/admin"}
-                            style={{
-                                color: "black",
-                                textDecoration: "none",
-                            }}
-                        >
-                            Админка
-                        </MenuItem>
-                    )}
+                    {routes.map((route) => {
+                        return (
+                            <MenuItem
+                                key={route.path}
+                                onClick={handleCloseNavMenu}
+                                component={NavLink}
+                                to={route.path}
+                                style={{
+                                    color: "black",
+                                    textDecoration: "none",
+                                }}
+                            >
+                                {route.name}
+                            </MenuItem>
+                        )
+                    })}
                 </Menu>
             </Box>
+            <ViewInArRoundedIcon
+                fontSize="medium"
+                sx={{
+                    display: { xs: "flex", md: "none", flexGrow: 1 },
+                    mr: 1,
+                }}
+            />
         </>
     )
 }

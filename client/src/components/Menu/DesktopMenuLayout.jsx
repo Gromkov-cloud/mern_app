@@ -1,27 +1,32 @@
 import { Box, Button } from "@mui/material"
 import { NavLink } from "react-router-dom"
+import ViewInArRoundedIcon from "@mui/icons-material/ViewInArRounded"
 
-const DesktopMenuLayout = ({ menuLinks }) => {
+const DesktopMenuLayout = ({ routes }) => {
     return (
         <>
+            <ViewInArRoundedIcon
+                fontSize="medium"
+                sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}
+            />
             <Box
                 sx={{
                     flexGrow: 1,
                     display: { xs: "none", md: "flex" },
                 }}
             >
-                {menuLinks.map((menuLink) => (
+                {routes.map((route) => (
                     <Button
-                        key={menuLink.name}
+                        key={route.path}
                         sx={{ my: 2, color: "white", display: "block" }}
                         component={NavLink}
-                        to={menuLink.route}
+                        to={route.path}
                         style={{
                             color: "white",
                             textDecoration: "none",
                         }}
                     >
-                        {menuLink.name}
+                        {route.name}
                     </Button>
                 ))}
             </Box>
