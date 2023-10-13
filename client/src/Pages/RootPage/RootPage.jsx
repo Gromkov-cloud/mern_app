@@ -1,10 +1,14 @@
 import Menu from "../../components/Menu/Menu"
+import PageHeader from "../../components/PageHeader/PageHeader"
 
 const RootPage = () => {
     return (
         <>
             <Menu></Menu>
-            <h1>Root page</h1>
+            <PageHeader
+                title={"Главная страница"}
+                subtitle={"Описание работы приложения"}
+            />
         </>
     )
 }
